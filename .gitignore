@@ -1,0 +1,19 @@
+# Python Files 
+__pycache__
+.ipynb_checkpoints
+
+# OsX Files 
+.DS_Store
+
+# vim stuff{{{
+.vim/
+    
+# swap
+[._]*.s[a-w][a-z]
+[._]s[a-w][a-z]
+# session
+Session.vim
+# temporary
+.netrwhist
+# auto-generated tag files
+# }}}
