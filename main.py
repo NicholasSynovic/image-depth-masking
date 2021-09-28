@@ -60,11 +60,11 @@ def depth(img, midas, transform, device):
 
 def main():
     args = get_argparse().parse_args()
-    filename1 = args.image
+    filename = args.image
+    output = "dept_map_" + filename
     midas, transform, device = get_midas(args.model)
-    plt.imshow(depth(filename1, midas, transform, device))
-    # plt.figure(0) 
-    plt.show()
+    plt.imshow(depth(filename, midas, transform, device))
+    plt.savefig(output)
 
 if __name__ == "__main__":
     main()
