@@ -17,3 +17,7 @@ Session.vim
 .netrwhist
 # auto-generated tag files
 # }}}
+*.jpg
+*.jpeg
+*.png
+*.gif

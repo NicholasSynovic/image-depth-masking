@@ -19,9 +19,9 @@ def get_argparse():
     parser.add_argument(
         "-m",
         "--model",
-        help="optional, select model to use: DPT_Large, DPT_Hybrid, MiDaS_small, default -> small",
-        default="MiDaS_small",
-        type=str,
+        help="optional, select model to use: 0: DPT_Large, 1: DPT_Hybrid, 2: MiDaS_small, default -> 2: small",
+        default=2,
+        type=int,
         required=False,
     )
     return parser
@@ -59,10 +59,11 @@ def depth(img, midas, transform, device):
 
 
 def main():
+    models = ["DPT_Large","DPT_Hybrid", "MiDaS_small"]
     args = get_argparse().parse_args()
     filename = args.image
     output = "dept_map_" + filename
-    midas, transform, device = get_midas(args.model)
+    midas, transform, device = get_midas(models[args.model])
     plt.imshow(depth(filename, midas, transform, device))
     plt.savefig(output)
 
