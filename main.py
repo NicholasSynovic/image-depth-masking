@@ -62,7 +62,7 @@ def main():
     models = ["DPT_Large","DPT_Hybrid", "MiDaS_small"]
     args = get_argparse().parse_args()
     filename = args.image
-    output = "dept_map_" + filename
+    output = "dept_map_" + models[args.model]+ "_" + filename 
     midas, transform, device = get_midas(models[args.model])
     plt.imshow(depth(filename, midas, transform, device))
     plt.savefig(output)
