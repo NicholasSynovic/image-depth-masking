@@ -28,7 +28,7 @@ def get_argparse():
 
 def get_midas(model_type):
     midas = torch.hub.load("intel-isl/MiDaS", model_type)
-    device = "cpu"
+    device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu") # pylint: disable=no-member
     midas.to(device)
 
     midas_transforms = torch.hub.load("intel-isl/MiDaS", "transforms")
