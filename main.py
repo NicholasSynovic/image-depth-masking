@@ -75,7 +75,6 @@ def get_folder_images(folder_name):
     image_exts = (".jpg", ".jpeg", ".png")
     images_path = [os.path.join(folder_name,_) for _ in os.listdir(folder_name) if _.lower().endswith(image_exts)]
     images_ = [_ for _ in os.listdir(folder_name) if _.lower().endswith(image_exts)]
-    print(images_)
     return images_path, images_
 
 
@@ -92,11 +91,9 @@ def output_depth_map_image_folder(folder_name,model):
     output_path =  "depth_maps_" + folder_name
     if not os.path.exists(output_path): os.makedirs(output_path)
 
-    print(images_)
     for image_path,image_ in zip(images_path,images_):
         output = "dept_map_" + models[model]+ "_" + image_ 
         output = os.path.join(output_path,output)
-        print("IMAGEEEEE: ", image_)
         midas, transform, device = get_midas(models[model])
         plt.imshow(depth(image_path, midas, transform, device))
         plt.savefig(output)
