@@ -73,22 +73,39 @@ def get_folder_images(folder_name):
     Gets images from folder 
     """
     image_exts = (".jpg", ".jpeg", ".png")
-    images_ = [os.path.join(folder_name,_) for _ in os.listdir(folder_name) if _.lower().endswith(image_exts)]
+    images_path = [os.path.join(folder_name,_) for _ in os.listdir(folder_name) if _.lower().endswith(image_exts)]
+    images_ = [_ for _ in os.listdir(folder_name) if _.lower().endswith(image_exts)]
     print(images_)
+    return images_path, images_
 
 
+def output_depth_map_image_file(file_name,model):
+    models = ["DPT_Large","DPT_Hybrid", "MiDaS_small"]
+    output = "dept_map_" + models[model]+ "_" + file_name 
+    midas, transform, device = get_midas(models[model])
+    plt.imshow(depth(file_name, midas, transform, device))
+    plt.savefig(output)
+
+def output_depth_map_image_folder(folder_name,model):
+    models = ["DPT_Large","DPT_Hybrid", "MiDaS_small"]
+    images_path, images_ = get_folder_images(folder_name)
+    output_path =  "depth_maps_" + folder_name
+    if not os.path.exists(output_path): os.makedirs(output_path)
+
+    print(images_)
+    for image_path,image_ in zip(images_path,images_):
+        output = "dept_map_" + models[model]+ "_" + image_ 
+        output = os.path.join(output_path,output)
+        print("IMAGEEEEE: ", image_)
+        midas, transform, device = get_midas(models[model])
+        plt.imshow(depth(image_path, midas, transform, device))
+        plt.savefig(output)
 
 
 def main():
-    models = ["DPT_Large","DPT_Hybrid", "MiDaS_small"]
     args = get_argparse().parse_args()
-    get_folder_images(args.folder)
-    sys.exit(0)
-    filename = args.image
-    output = "dept_map_" + models[args.model]+ "_" + filename 
-    midas, transform, device = get_midas(models[args.model])
-    plt.imshow(depth(filename, midas, transform, device))
-    plt.savefig(output)
+    img_ = args.image if args.image else args.folder
+    output_depth_map_image_file(img_,args.model) if args.image else output_depth_map_image_folder(img_,args.model)
 
 if __name__ == "__main__":
     main()
