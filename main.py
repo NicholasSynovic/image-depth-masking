@@ -2,6 +2,8 @@ import cv2
 import torch
 from argparse import ArgumentParser
 import matplotlib.pyplot as plt
+import os
+import sys
 # import os
 
 def get_argparse():
@@ -14,7 +16,8 @@ def get_argparse():
         "--image",
         help="image for the model",
         type=str,
-        required=True,
+        # required=True,
+        required=False,
     )
     parser.add_argument(
         "-m",
@@ -22,6 +25,13 @@ def get_argparse():
         help="optional, select model to use: 0: DPT_Large, 1: DPT_Hybrid, 2: MiDaS_small, default -> 2: small",
         default=2,
         type=int,
+        required=False,
+    )
+    parser.add_argument(
+        "-f",
+        "--folder",
+        help="Pass a folder of images",
+        type=str,
         required=False,
     )
     return parser
@@ -58,9 +68,22 @@ def depth(img, midas, transform, device):
     return output
 
 
+def get_folder_images(folder_name):
+    """
+    Gets images from folder 
+    """
+    image_exts = (".jpg", ".jpeg", ".png")
+    images_ = [os.path.join(folder_name,_) for _ in os.listdir(folder_name) if _.lower().endswith(image_exts)]
+    print(images_)
+
+
+
+
 def main():
     models = ["DPT_Large","DPT_Hybrid", "MiDaS_small"]
     args = get_argparse().parse_args()
+    get_folder_images(args.folder)
+    sys.exit(0)
     filename = args.image
     output = "dept_map_" + models[args.model]+ "_" + filename 
     midas, transform, device = get_midas(models[args.model])
