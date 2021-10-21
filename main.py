@@ -82,7 +82,8 @@ def output_depth_map_image_file(file_name,model):
     models = ["DPT_Large","DPT_Hybrid", "MiDaS_small"]
     output = "dept_map_" + models[model]+ "_" + file_name 
     midas, transform, device = get_midas(models[model])
-    plt.imshow(depth(file_name, midas, transform, device))
+    depth_ = depth(file_name, midas, transform, device)
+    plt.imshow(depth_)
     plt.savefig(output)
 
 def output_depth_map_image_folder(folder_name,model):
@@ -95,7 +96,8 @@ def output_depth_map_image_folder(folder_name,model):
         output = "dept_map_" + models[model]+ "_" + image_ 
         output = os.path.join(output_path,output)
         midas, transform, device = get_midas(models[model])
-        plt.imshow(depth(image_path, midas, transform, device))
+        depth_ = depth(image_path, midas, transform, device)
+        plt.imshow(depth_)
         plt.savefig(output)
 
 
