@@ -116,7 +116,9 @@ def output_depth_map_array_folder(folder_name,model):
     if not os.path.exists(output_path): os.makedirs(output_path)
 
     for image_path,image_ in zip(images_path,images_):
-        output = "dept_map_" + models[model]+ "_" + image_ + ".csv"
+        image_file_name = image_.split(".")
+        image_file_name = ''.join(image_file_name[:len(image_file_name)-1]) # remove previous file extension
+        output = "dept_map_" + models[model]+ "_" + image_file_name + ".csv"
         output = os.path.join(output_path,output)
         midas, transform, device = get_midas(models[model])
         depth_ = depth(image_path, midas, transform, device)
@@ -141,7 +143,8 @@ def create_img_mask(depth_array, threshold):
     return np.where(depth_array >= thresh_val, 0, 1) # set anything above the depth to 0, and others to 1
 
 def output_mask_array_folder(folder_name,threshold):
-    original_folder_name = folder_name.split("_")[-1] # remove depth_map prefixes from folder name
+    original_folder_name = folder_name.split("_")[2:] # remove depth_map prefixes from folder name
+    original_folder_name = ''.join(original_folder_name)
     output_path = "masks_" + original_folder_name
     if not os.path.exists(output_path): os.makedirs(output_path)
     depths_ = [_ for _ in os.listdir(folder_name) if _.lower().endswith(".csv")] # get csv files
@@ -150,7 +153,8 @@ def output_mask_array_folder(folder_name,threshold):
         depth_path = os.path.join(folder_name,depth_)
         depth_arr = np.genfromtxt(depth_path,delimiter=",")
         mask = create_img_mask(depth_arr,threshold)
-        original_file_name = depth_.split("_")[-1] #remove other prefixes from file name
+        original_file_name = depth_.split("_")[4:] #remove depth_map prefix and model_name prefix from folder name
+        original_file_name = ''.join(original_file_name)
         output = "mask_" + original_file_name
         output = os.path.join(output_path,output)
         np.savetxt(output, mask, delimiter=",")
