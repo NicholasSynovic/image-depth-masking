@@ -35,6 +35,14 @@ def get_argparse():
         type=str,
         required=False,
     )
+    parser.add_argument(
+        "-t",
+        "--threshold",
+        help="optional, threshold value for mask generating",
+        default=0.7,
+        type=float,
+        required=False,
+    )
     return parser
 
 def get_midas(model_type):
@@ -78,7 +86,6 @@ def get_folder_images(folder_name):
     images_ = [_ for _ in os.listdir(folder_name) if _.lower().endswith(image_exts)]
     return images_path, images_
 
-
 # def output_depth_map_image_file(file_name,model):
 #     models = ["DPT_Large","DPT_Hybrid", "MiDaS_small"]
 #     output = "dept_map_" + models[model]+ "_" + file_name 
@@ -101,6 +108,7 @@ def get_folder_images(folder_name):
 #         plt.imshow(depth_)
 #         plt.savefig(output)
 
+# take folder of images and output the depth map of images into a folder of csv files
 def output_depth_map_array_folder(folder_name,model):
     models = ["DPT_Large","DPT_Hybrid", "MiDaS_small"]
     images_path, images_ = get_folder_images(folder_name)
@@ -116,12 +124,42 @@ def output_depth_map_array_folder(folder_name,model):
         # plt.savefig(output)
         np.savetxt(output,depth_,delimiter=",")
 
+# 
 def create_img_mask(depth_array, threshold):
+    """
+    takes an image depth_array, with threshold/cutoff value 
+    Params: 
+        depth_array: np array, of depth values
+        threshold: threshold value, between 0 and 1
+
+    Returns: 
+        np array of 0s and 1s, for where to turn on or off image pixel
+
+    """
     max_ = np.amax(depth_array)
     thresh_val = threshold*max_
-    return np.where(depth_array < thresh_val, 0, 1)
+    return np.where(depth_array >= thresh_val, 0, 1) # set anything above the depth to 0, and others to 1
 
-# def 
+def output_mask_array_folder(folder_name,threshold):
+    original_folder_name = folder_name.split("_")[-1] # remove depth_map prefixes from folder name
+    output_path = "masks_" + original_folder_name
+    if not os.path.exists(output_path): os.makedirs(output_path)
+    depths_ = [_ for _ in os.listdir(folder_name) if _.lower().endswith(".csv")] # get csv files
+
+    for depth_ in depths_:
+        depth_path = os.path.join(folder_name,depth_)
+        depth_arr = np.genfromtxt(depth_path,delimiter=",")
+        mask = create_img_mask(depth_arr,threshold)
+        original_file_name = depth_.split("_")[-1] #remove other prefixes from file name
+        output = "mask_" + original_file_name
+        output = os.path.join(output_path,output)
+        np.savetxt(output, mask, delimiter=",")
+
+
+
+
+
+
 
 
 
@@ -130,7 +168,9 @@ def main():
     # img_ = args.image if args.image else args.folder
     # output_depth_map_image_file(img_,args.model) if args.image else output_depth_map_image_folder(img_,args.model)
     imgs_ = args.folder
-    output_depth_map_array_folder(imgs_,args.model)
+    # output_depth_map_array_folder(imgs_,args.model)
+    output_mask_array_folder(imgs_,args.threshold)
+
 
 if __name__ == "__main__":
     main()
