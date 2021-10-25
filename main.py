@@ -4,6 +4,7 @@ from argparse import ArgumentParser
 import matplotlib.pyplot as plt
 import os
 import sys
+import numpy as np
 # import os
 
 def get_argparse():
@@ -78,33 +79,58 @@ def get_folder_images(folder_name):
     return images_path, images_
 
 
-def output_depth_map_image_file(file_name,model):
-    models = ["DPT_Large","DPT_Hybrid", "MiDaS_small"]
-    output = "dept_map_" + models[model]+ "_" + file_name 
-    midas, transform, device = get_midas(models[model])
-    depth_ = depth(file_name, midas, transform, device)
-    plt.imshow(depth_)
-    plt.savefig(output)
+# def output_depth_map_image_file(file_name,model):
+#     models = ["DPT_Large","DPT_Hybrid", "MiDaS_small"]
+#     output = "dept_map_" + models[model]+ "_" + file_name 
+#     midas, transform, device = get_midas(models[model])
+#     depth_ = depth(file_name, midas, transform, device)
+#     plt.imshow(depth_)
+#     plt.savefig(output)
 
-def output_depth_map_image_folder(folder_name,model):
+# def output_depth_map_image_folder(folder_name,model):
+#     models = ["DPT_Large","DPT_Hybrid", "MiDaS_small"]
+#     images_path, images_ = get_folder_images(folder_name)
+#     output_path =  "depth_maps_" + folder_name
+#     if not os.path.exists(output_path): os.makedirs(output_path)
+#
+#     for image_path,image_ in zip(images_path,images_):
+#         output = "dept_map_" + models[model]+ "_" + image_ 
+#         output = os.path.join(output_path,output)
+#         midas, transform, device = get_midas(models[model])
+#         depth_ = depth(image_path, midas, transform, device)
+#         plt.imshow(depth_)
+#         plt.savefig(output)
+
+def output_depth_map_array_folder(folder_name,model):
     models = ["DPT_Large","DPT_Hybrid", "MiDaS_small"]
     images_path, images_ = get_folder_images(folder_name)
     output_path =  "depth_maps_" + folder_name
     if not os.path.exists(output_path): os.makedirs(output_path)
 
     for image_path,image_ in zip(images_path,images_):
-        output = "dept_map_" + models[model]+ "_" + image_ 
+        output = "dept_map_" + models[model]+ "_" + image_ + ".csv"
         output = os.path.join(output_path,output)
         midas, transform, device = get_midas(models[model])
         depth_ = depth(image_path, midas, transform, device)
-        plt.imshow(depth_)
-        plt.savefig(output)
+        # plt.imshow(depth_)
+        # plt.savefig(output)
+        np.savetxt(output,depth_,delimiter=",")
+
+def create_img_mask(depth_array, threshold):
+    max_ = np.amax(depth_array)
+    thresh_val = threshold*max_
+    return np.where(depth_array < thresh_val, 0, 1)
+
+# def 
+
 
 
 def main():
     args = get_argparse().parse_args()
-    img_ = args.image if args.image else args.folder
-    output_depth_map_image_file(img_,args.model) if args.image else output_depth_map_image_folder(img_,args.model)
+    # img_ = args.image if args.image else args.folder
+    # output_depth_map_image_file(img_,args.model) if args.image else output_depth_map_image_folder(img_,args.model)
+    imgs_ = args.folder
+    output_depth_map_array_folder(imgs_,args.model)
 
 if __name__ == "__main__":
     main()
