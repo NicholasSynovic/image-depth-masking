@@ -30,8 +30,15 @@ def get_argparse():
     )
     parser.add_argument(
         "-f",
-        "--folder",
+        "--image_folder",
         help="Pass a folder of images",
+        type=str,
+        required=False,
+    )
+    parser.add_argument(
+        "-df",
+        "--depth_folder",
+        help="Pass a folder of depth maps",
         type=str,
         required=False,
     )
@@ -171,9 +178,7 @@ def main():
     args = get_argparse().parse_args()
     # img_ = args.image if args.image else args.folder
     # output_depth_map_image_file(img_,args.model) if args.image else output_depth_map_image_folder(img_,args.model)
-    imgs_ = args.folder
-    # output_depth_map_array_folder(imgs_,args.model)
-    output_mask_array_folder(imgs_,args.threshold)
+    output_mask_array_folder(args.depth_folder,args.threshold) if args.depth_folder else output_depth_map_array_folder(args.image_folder,args.model)
 
 
 if __name__ == "__main__":
