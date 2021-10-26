@@ -181,6 +181,10 @@ def apply_mask(image_folder,mask_folder):
     output_path = "applied_mask_" + image_folder
     if not os.path.exists(output_path): os.makedirs(output_path)
 
+    #sort files
+    images = sorted(images)
+    masks = sorted(masks)
+
     for image, mask in zip(images,masks):
         img_path = os.path.join(image_folder,image)
         mask_path = os.path.join(mask_folder,mask)
@@ -193,18 +197,10 @@ def apply_mask(image_folder,mask_folder):
         img_arr[masked] = [0,0,0]
 
         image_no_ext = os.path.splitext(image)[0]
-        output =  "masked_" + image_no_ext + ".csv"
+        output =  "masked_" + image_no_ext + ".jpg"
         output = os.path.join(output_path, output)
-        np.savetxt(output,img_arr,delimiter=",")
-
-        
-
-    
-
-
-
-
-
+        plt.imshow(img_arr)
+        plt.savefig(output)
 
 def main():
     args = get_argparse().parse_args()
