@@ -160,7 +160,7 @@ def create_img_mask(depth_array, threshold):
 def output_mask_array_folder(folder_name,threshold):
     original_folder_name = folder_name.split("_")[2:] # remove depth_map prefixes from folder name
     original_folder_name = ''.join(original_folder_name)
-    output_path = "masks_" + original_folder_name
+    output_path = str(threshold) + "_"+ "masks_" + original_folder_name
     if not os.path.exists(output_path): os.makedirs(output_path)
     depths_ = [_ for _ in os.listdir(folder_name) if _.lower().endswith(".csv")] # get csv files
 
