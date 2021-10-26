@@ -7,7 +7,7 @@ import sys
 import numpy as np
 from PIL import Image
 # import os
-
+#TODO: update usage
 def get_argparse():
     parser = ArgumentParser(
         prog="quick start with midas model",
