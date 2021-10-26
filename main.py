@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import os
 import sys
 import numpy as np
+from PIL import Image
 # import os
 
 def get_argparse():
@@ -167,7 +168,31 @@ def output_mask_array_folder(folder_name,threshold):
         np.savetxt(output, mask, delimiter=",")
 
 
+def apply_mask(image_folder,mask_folder):
+    _, images =  get_folder_images(image_folder)
+    masks = [_ for _ in os.listdir(mask_folder) if _.lower().endswith(".csv")] # get csv files
+    output_path = "applied_mask_" + image_folder
+    if not os.path.exists(output_path): os.makedirs(output_path)
 
+    for image, mask in zip(images,masks):
+        img_path = os.path.join(image_folder,image)
+        mask_path = os.path.join(mask_folder,mask)
+        img_ = Image.open(img_path)
+        img_arr = np.array(img_)
+        mask_arr = np.genfromtxt(mask_path,delimiter=',')
+
+        # set pixel of mask:0 to black, leave the rest as original color 
+        masked = np.where(mask_arr == 1, img_arr[:,:,0], 0)
+        img_arr[masked] = [0,0,0]
+
+        image_no_ext = os.path.splitext(image)[0]
+        output =  "masked_" + image_no_ext + ".csv"
+        output = os.path.join(output_path, output)
+        np.savetxt(output,img_arr,delimiter=",")
+
+        
+
+    
 
 
 
