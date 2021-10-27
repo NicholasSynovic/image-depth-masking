@@ -181,7 +181,8 @@ def output_mask_array_folder(folder_name,threshold):
 def apply_mask(image_folder,mask_folder):
     _, images =  get_folder_images(image_folder)
     masks = [_ for _ in os.listdir(mask_folder) if _.lower().endswith(".csv")] # get csv files
-    output_path = "applied_mask_" + image_folder
+    thr = mask_folder.split('_')[0]
+    output_path = thr + "_" + "applied_mask_" + image_folder
     if not os.path.exists(output_path): os.makedirs(output_path)
 
     #sort files
