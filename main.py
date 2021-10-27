@@ -155,7 +155,10 @@ def create_img_mask(depth_array, threshold):
     """
     max_ = np.amax(depth_array)
     thresh_val = threshold*max_
-    return np.where(depth_array >= thresh_val, 0, 1) # set anything above the depth to 0, and others to 1
+    return np.where(depth_array >= thresh_val, False, True) # set anything above the depth to 0, and others to 1
+    # return depth_array < threshold
+    # return (depth_array < threshold).astype(int)
+
 
 def output_mask_array_folder(folder_name,threshold):
     original_folder_name = folder_name.split("_")[2:] # remove depth_map prefixes from folder name
@@ -193,8 +196,7 @@ def apply_mask(image_folder,mask_folder):
         mask_arr = np.genfromtxt(mask_path,delimiter=',')
 
         # set pixel of mask:0 to black, leave the rest as original color 
-        masked = np.where(mask_arr == 1, img_arr[:,:,0], 0)
-        img_arr[masked] = [0,0,0]
+        img_arr[mask_arr.astype(bool), :] = 0
 
         image_no_ext = os.path.splitext(image)[0]
         output =  "masked_" + image_no_ext + ".jpg"
