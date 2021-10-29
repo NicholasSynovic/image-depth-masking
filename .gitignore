@@ -18,9 +18,9 @@ Session.vim
 .netrwhist
 # auto-generated tag files
 # }}}
-*.jpg
-*.jpeg
-*.png
-*.gif
-*.csv
-*.txt
+# *.jpg
+# *.jpeg
+# *.png
+# *.gif
+# *.csv
+# *.txt
