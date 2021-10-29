@@ -18,7 +18,7 @@
 
 ### To apply the image mask
 - with the new image mask folder generated, you can apply the mask to the image
-- run `python main.py -i <image_folder> -df <mask_folder> `
+- run `python main.py -i <image_folder> -mf <mask_folder> `
 - this outputs a folder of images with the mask applied to a folder `<${threshold}_applied_mask_${image_folder}>`
 
 
