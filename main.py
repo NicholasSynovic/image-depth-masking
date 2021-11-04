@@ -10,7 +10,7 @@ from PIL import Image
 #TODO: update usage
 def get_argparse():
     parser = ArgumentParser(
-        prog="quick start with midas model",
+        prog="Masking images with depth maps",
         usage="Computes image depth map, and generate mask from depth map",
     )
     parser.add_argument(
@@ -46,7 +46,7 @@ def get_argparse():
     parser.add_argument(
         "-mf",
         "--mask_folder",
-        help="Folder containing image mask. Must be passed along with the image folder, to run",
+        help="Folder containing image mask. Must be passed along with the image folder to run",
         type=str,
         required=False,
     )
