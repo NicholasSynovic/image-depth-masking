@@ -29,5 +29,18 @@ def apply_mask_single(image_file,mask_arr):
 
     return img_arr
 
+def make_gt_map(image,bboxes):
+    return 0
+
+
+# convert groundtruth bbox format '<bb_left>, <bb_top>, <bb_width>, <bb_height>' to proper index for array slicing
+def convert_bbox_to_slices(bbox):
+    top = bbox[1]
+    bottom = bbox[1] + bbox[3]+1
+    left = bbox[0]
+    right = bbox[0] + bbox[2]+1
+    return top,bottom,left,right
+def fill_gt_bbox(gt_arr, bboxes):
+     for box in bboxes:
 
 
