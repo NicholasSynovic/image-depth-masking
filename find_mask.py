@@ -69,7 +69,7 @@ def find_mask(depth_array, img_file, bboxes, thresh=0.9):
 
         if percentage_covered >= thresh:
             found_mask = True
-
+        counter -= 1
     return mask_arr
 
 
