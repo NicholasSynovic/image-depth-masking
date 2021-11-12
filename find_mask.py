@@ -6,7 +6,7 @@ import os
 import sys
 import numpy as np
 from PIL import Image
-
+#TODO: Write proper docs for all functions 
 def create_img_mask(depth_array, threshold):
     """
     takes an image depth_array, with threshold/cutoff value 
@@ -40,7 +40,46 @@ def convert_bbox_to_slices(bbox):
     left = bbox[0]
     right = bbox[0] + bbox[2]+1
     return top,bottom,left,right
+
 def fill_gt_bbox(gt_arr, bboxes):
-     for box in bboxes:
+     for bbox in bboxes:
+         top,bottom,left,right = convert_bbox_to_slices(bbox)
+         gt_arr[top:bottom, left:right] = 1 # fill rectangle with ones
+
+    
+## TODO: put 90% for percentage for groundtruth. i.e 90% of original 1s are blacked out(changed to 0s)
+
+def find_mask(depth_array, img_file, bboxes, thresh=0.9): 
+    im_ar = np.array(Image.open(img_file))
+    shape_ = im_ar.shape[0:2]
+    gt_arr = np.zeros(shape_) #groundtruth map array
+
+    fill_gt_bbox(gt_arr,bboxes) # populate bounding box with 1s
+    total_ones_gt = np.count_nonzero(gt_arr) # count 1s in groundtruth array
+    
+    # add to for loop
+    found_mask = False
+    counter = 9
+    mask_arr = []
+    while not found_mask:
+        mask_arr = create_img_mask(depth_array, counter*0.1)
+        output = np.logical_and(mask_arr,gt_arr)
+        output_ones = np.count_nonzero(output)
+        percentage_covered = (total_ones_gt - output_ones) / total_ones_gt
+
+        if percentage_covered >= thresh:
+            found_mask = True
+
+    return mask_arr
 
 
+
+
+
+
+
+
+
+    
+
+    

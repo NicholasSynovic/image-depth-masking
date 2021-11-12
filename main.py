@@ -8,6 +8,7 @@ import numpy as np
 from PIL import Image
 # import os
 #TODO: update usage
+#TODO: write proper docs for all functions
 def get_argparse():
     parser = ArgumentParser(
         prog="Masking images with depth maps",
