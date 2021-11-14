@@ -117,7 +117,7 @@ def find_mask_on_MOT_images(image_folder,depth_folder, gt_folder):
     # get root folder
     root_folder = image_folder.split('/')[0]
 
-    output_path_masks = os.path.join(image_folder,"masks")
+    output_path_masks = os.path.join(root_folder,"masks")
     if not os.path.exists(output_path_masks): os.makedirs(output_path_masks)
 
     images = sorted(images)
@@ -125,9 +125,13 @@ def find_mask_on_MOT_images(image_folder,depth_folder, gt_folder):
     df_grouped = parse_MOT_gt(gt_file)
 
     for group,df_group in df_grouped:
-        print(group)
+        # print(group)
         image_ = images[group-1]
-        depth_arr = depths_[group-1]
+        image_ = os.path.join(image_folder,image_)
+
+        depth_path = depths_[group-1]
+        depth_path = os.path.join(depth_folder,depth_path)
+        depth_arr = np.genfromtxt(depth_path,delimiter=',')
         bboxes = []
         
         for row_index, row in df_group.iterrows():
@@ -145,7 +149,7 @@ def find_mask_on_MOT_images(image_folder,depth_folder, gt_folder):
 
         image_name = os.path.splitext(image_)[0]
         image_name = image_name.split('/')[-1] 
-        output_mask = str(depth_level) + "_mask_" + image_name
+        output_mask = "depth_" + str(depth_level) + "_mask_" + image_name + ".csv"
         output_mask = os.path.join(output_path_masks, output_mask)
         np.savetxt(output_mask, mask, delimiter=",")
 
