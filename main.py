@@ -169,7 +169,8 @@ def output_mask_array_folder(folder_name,threshold):
         depth_path = os.path.join(folder_name,depth_)
         depth_arr = np.genfromtxt(depth_path,delimiter=",")
         mask = create_img_mask(depth_arr,threshold)
-        original_file_name = depth_.split("_")[4:] #remove depth_map prefix and model_name prefix from folder name
+        # original_file_name = depth_.split("_")[4:] #remove depth_map prefix and model_name prefix from folder name
+        original_file_name = depth_.split("_")[2] #remove depth_map prefix 
         original_file_name = ''.join(original_file_name)
         output = "mask_" + original_file_name
         output = os.path.join(output_path,output)
