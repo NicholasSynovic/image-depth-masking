@@ -121,12 +121,14 @@ def output_depth_map_array_folder(folder_name,model):
     models = ["DPT_Large","DPT_Hybrid", "MiDaS_small"]
     images_path, images_ = get_folder_images(folder_name)
     output_path =  "depth_maps_" + folder_name
+    output_path = os.path.join(folder_name,output_path)
     if not os.path.exists(output_path): os.makedirs(output_path)
 
     for image_path,image_ in zip(images_path,images_):
         image_file_name = image_.split(".")
         image_file_name = ''.join(image_file_name[:len(image_file_name)-1]) # remove previous file extension
-        output = "dept_map_" + models[model]+ "_" + image_file_name + ".csv"
+        # output = "dept_map_" + models[model]+ "_" + image_file_name + ".csv"
+        output = "dept_map_" + image_file_name + ".csv"
         output = os.path.join(output_path,output)
         midas, transform, device = get_midas(models[model])
         depth_ = depth(image_path, midas, transform, device)
