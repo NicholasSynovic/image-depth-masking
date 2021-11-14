@@ -157,9 +157,11 @@ def create_img_mask(depth_array, threshold):
 
 
 def output_mask_array_folder(folder_name,threshold):
-    original_folder_name = folder_name.split("_")[2:] # remove depth_map prefixes from folder name
-    original_folder_name = ''.join(original_folder_name)
-    output_path = str(threshold) + "_"+ "masks_" + original_folder_name
+    # original_folder_name = folder_name.split("_")[2:] # remove depth_map prefixes from folder name
+    # original_folder_name = ''.join(original_folder_name)
+    root_folder = folder_name.split('/')[0]
+    output_path = str(threshold) + "_"+ "masks"
+    output_path = os.path.join(root_folder,output_path)
     if not os.path.exists(output_path): os.makedirs(output_path)
     depths_ = [_ for _ in os.listdir(folder_name) if _.lower().endswith(".csv")] # get csv files
 
@@ -177,8 +179,11 @@ def output_mask_array_folder(folder_name,threshold):
 def apply_mask(image_folder,mask_folder):
     _, images =  get_folder_images(image_folder)
     masks = [_ for _ in os.listdir(mask_folder) if _.lower().endswith(".csv")] # get csv files
-    thr = mask_folder.split('_')[0]
-    output_path = thr + "_" + "applied_mask_" + image_folder
+    # thr = mask_folder.split('_')[0]
+    root_folder = image_folder.split('/')[0]
+    # output_path = str(threshold) + "_"+ "masks"
+    output_path = "applied_mask"
+    output_path = os.path.join(root_folder,output_path)
     if not os.path.exists(output_path): os.makedirs(output_path)
 
     #sort files
