@@ -120,8 +120,9 @@ def get_folder_images(folder_name):
 def output_depth_map_array_folder(folder_name,model):
     models = ["DPT_Large","DPT_Hybrid", "MiDaS_small"]
     images_path, images_ = get_folder_images(folder_name)
-    output_path =  "depth_maps_" + folder_name
-    output_path = os.path.join(folder_name,output_path)
+    output_path =  "depth_maps"
+    root_folder = folder_name.split('/')[0]
+    output_path = os.path.join(root_folder,output_path)
     if not os.path.exists(output_path): os.makedirs(output_path)
 
     for image_path,image_ in zip(images_path,images_):
