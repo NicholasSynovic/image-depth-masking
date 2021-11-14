@@ -6,6 +6,7 @@ import os
 import sys
 import numpy as np
 from PIL import Image
+import pandas as pd
 #TODO: Write proper docs for all functions 
 def create_img_mask(depth_array, threshold):
     """
@@ -72,14 +73,9 @@ def find_mask(depth_array, img_file, bboxes, thresh=0.9):
         counter -= 1
     return mask_arr
 
+def parse_MOT_gt(gt_file):
+    headers = ["frame","id","bb_left","bb_top","bb_width","bb_height"]
+    df = pd.read_csv('ADL_batch1/gt.txt',delimiter=",", header=None, usecols=list(range(0,6)))
+    df.columns = headers
 
-
-
-
-
-
-
-
-    
-
-    
+def run_on_MOT_images(image_folder)
