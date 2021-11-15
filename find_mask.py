@@ -23,13 +23,6 @@ def get_argparse():
         required=True,
     )
     parser.add_argument(
-        "-df",
-        "--depth_folder",
-        help="Depth map folder name",
-        type=str,
-        required=True,
-    )
-    parser.add_argument(
         "-gt",
         "--gt_folder",
         help="ground truth folder name",
@@ -130,7 +123,7 @@ def parse_COCO_gt(annotations_file):
     df_grouped = df.groupby('frame') #group by image frame 
     return image_set, df_grouped
 
-def find_mask_on_COCO_images(image_folder,depth_folder, gt_file):
+def find_mask_on_COCO_images(image_folder, gt_file):
     models = ["DPT_Large","DPT_Hybrid", "MiDaS_small"]
 
     df_stats = pd.DataFrame(columns=("Image","Depth_level","Useful_pixels(%)"))
@@ -146,13 +139,17 @@ def find_mask_on_COCO_images(image_folder,depth_folder, gt_file):
     images.sort()
 
     image_set,df_grouped = parse_COCO_gt(gt_file)
+    # helper
     def remove_ext(file_):
         return file_.split(".")[0]
     filtered_images = [im for im in images if int(remove_ext(im)) in image_set] # ignore images without annotations
 
 
     for group,df_group in df_grouped:
-        image_ = filtered_images[group-1]
+        # print(group)
+        # print(type(group))
+        # sys.exit(0)
+        image_ = filtered_images[int(group-1)]
         image_ = os.path.join(image_folder,image_)
 
         midas, transform, device = get_midas(models[2])
@@ -174,9 +171,9 @@ def find_mask_on_COCO_images(image_folder,depth_folder, gt_file):
 
         image_name = os.path.splitext(image_)[0]
         image_name = image_name.split('/')[-1] 
-        output_mask = "depth_" + str(depth_level) + "_mask_" + image_name + ".csv"
-        output_mask = os.path.join(output_path_masks, output_mask)
-        np.savetxt(output_mask, mask, delimiter=",")
+        # output_mask = "depth_" + str(depth_level) + "_mask_" + image_name + ".csv"
+        # output_mask = os.path.join(output_path_masks, output_mask)
+        # np.savetxt(output_mask, mask, delimiter=",")
 
     stats = os.path.join(image_folder,'stats.csv')
     df_stats.to_csv(stats,index=False)
@@ -185,10 +182,11 @@ def find_mask_on_COCO_images(image_folder,depth_folder, gt_file):
 def main():
     args = get_argparse().parse_args()
     image_folder = args.image_folder
-    depth_folder = args.depth_folder
+    # depth_folder = args.depth_folder
     gt_folder = args.gt_folder
 
-    find_mask_on_MOT_images(image_folder,depth_folder,gt_folder)
+    find_mask_on_COCO_images(image_folder,gt_folder)
+
 
 if __name__ == "__main__":
     main()
