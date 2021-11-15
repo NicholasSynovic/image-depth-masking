@@ -7,7 +7,7 @@ import sys
 import numpy as np
 from PIL import Image
 import pandas as pd
-from main import get_folder_images
+from main import get_folder_images, get_midas, depth
 import json
 #TODO: Write proper docs for all functions 
 def get_argparse():
@@ -109,6 +109,7 @@ def parse_COCO_gt(annotations_file):
     f.close()
 
     annotations = data['annotations']
+    image_set = list(map(lambda x: x['image_id'], annotations)) # save set of images for optimized search
 
     # use for sorting
     def take_first(item):
@@ -127,14 +128,13 @@ def parse_COCO_gt(annotations_file):
 
         df = df.append(entry, ignore_index=True)
     df_grouped = df.groupby('frame') #group by image frame 
-    return df_grouped
+    return image_set, df_grouped
 
-def find_mask_on_COCO_images(image_folder,depth_folder, gt_folder):
+def find_mask_on_COCO_images(image_folder,depth_folder, gt_file):
+    models = ["DPT_Large","DPT_Hybrid", "MiDaS_small"]
 
     df_stats = pd.DataFrame(columns=("Image","Depth_level","Useful_pixels(%)"))
     _, images = get_folder_images(image_folder)
-    depths_ = [_ for _ in os.listdir(depth_folder) if _.lower().endswith(".csv")] # get csv files
-    gt_file = os.path.join(gt_folder,'gt.txt')
 
     # get root folder
     root_folder = image_folder.split('/')[0]
@@ -142,17 +142,21 @@ def find_mask_on_COCO_images(image_folder,depth_folder, gt_folder):
     output_path_masks = os.path.join(root_folder,"masks")
     if not os.path.exists(output_path_masks): os.makedirs(output_path_masks)
 
-    images = sorted(images)
-    depths_ = sorted(depths_)
-    df_grouped = parse_COCO_gt(gt_file)
+    # images = sorted(images)
+    images.sort()
+
+    image_set,df_grouped = parse_COCO_gt(gt_file)
+    def remove_ext(file_):
+        return file_.split(".")[0]
+    filtered_images = [im for im in images if int(remove_ext(im)) in image_set] # ignore images without annotations
+
 
     for group,df_group in df_grouped:
-        image_ = images[group-1]
+        image_ = filtered_images[group-1]
         image_ = os.path.join(image_folder,image_)
 
-        depth_path = depths_[group-1]
-        depth_path = os.path.join(depth_folder,depth_path)
-        depth_arr = np.genfromtxt(depth_path,delimiter=',')
+        midas, transform, device = get_midas(models[2])
+        depth_arr = depth(image_, midas, transform, device)
         bboxes = []
         
         for row_index, row in df_group.iterrows():
