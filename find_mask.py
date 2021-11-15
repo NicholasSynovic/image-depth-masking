@@ -135,14 +135,19 @@ def find_mask_on_MOT_images(image_folder,depth_folder, gt_folder):
         bboxes = []
         
         for row_index, row in df_group.iterrows():
-            bbox = [row["bb_left"],row["bb_top"],row["bb_width"],row["bb_height"]]
-            points = convert_bbox_to_slices(bbox)
-            bboxes.append(points)
+            bbox_points = [row["bb_left"],row["bb_top"],row["bb_width"],row["bb_height"]]
+            # print("BBOX: ", bbox)
+            # points = convert_bbox_to_slices(bbox)
+            bboxes.append(bbox_points)
 
+        print(bboxes)
         depth_level, mask = find_mask(depth_arr,image_,bboxes)
+
+        print("depth: ",  depth_path, "image:" , image_ , "depth level: " , depth_level,"size: ", mask.size, "useless: ", np.count_nonzero(mask), )
         useful_pixels = (mask.size - np.count_nonzero(mask)) / mask.size
-        useful_pixels = round(useful_pixels,2)
-        useful_pixels = useful_pixels
+        print("______________________-")
+        # useful_pixels = round(useful_pixels,2)
+        useful_pixels = useful_pixels*100
 
         entry = {"Image": group, "Depth_level": depth_level, "Useful_pixels(%)": useful_pixels }
         df_stats = df_stats.append(entry, ignore_index=True)
