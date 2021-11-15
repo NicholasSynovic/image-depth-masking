@@ -103,7 +103,7 @@ def find_mask(depth_array, img_file, bboxes, thresh=0.9):
 
 def parse_MOT_gt(gt_file):
     headers = ["frame","id","bb_left","bb_top","bb_width","bb_height"]
-    df = pd.read_csv('ADL_batch1/gt.txt',delimiter=",", header=None, usecols=list(range(0,6)))
+    df = pd.read_csv(gt_file,delimiter=",", header=None, usecols=list(range(0,6)))
     df.columns = headers
 
     df_grouped = df.groupby('frame') #group by image frame 

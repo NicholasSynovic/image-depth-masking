@@ -8,6 +8,7 @@ import numpy as np
 from PIL import Image
 import pandas as pd
 from main import get_folder_images
+import json
 #TODO: Write proper docs for all functions 
 def get_argparse():
     parser = ArgumentParser(
@@ -101,15 +102,34 @@ def find_mask(depth_array, img_file, bboxes, thresh=0.9):
         depth_level -= 1
     return depth_level, mask_arr
 
-def parse_MOT_gt(gt_file):
-    headers = ["frame","id","bb_left","bb_top","bb_width","bb_height"]
-    df = pd.read_csv('ADL_batch1/gt.txt',delimiter=",", header=None, usecols=list(range(0,6)))
-    df.columns = headers
+# a json annotations file in coco format, parse the file and get groundtruth bounding boxes
+def parse_COCO_gt(annotations_file):
+    f = open(annotations_file)
+    data = json.load(f)
+    f.close()
 
+    annotations = data['annotations']
+
+    # use for sorting
+    def take_first(item):
+        return item[0]
+    images_boxes = sorted(list(map(lambda x: [x['image_id'], x['bbox']], annotations)),key=take_first)
+    headers = ["frame","bb_left","bb_top","bb_width","bb_height"]
+    df = pd.DataFrame(columns = headers)
+
+    for i in images_boxes:
+        frame = i[0]
+        bb_left = i[1][0]
+        bb_top = i[1][1]
+        bb_width = i[1][2]
+        bb_height = i[1][3]
+        entry = {"frame": frame, "bb_left": bb_left, "bb_top": bb_top, "bb_width": bb_width, "bb_height": bb_height}
+
+        df = df.append(entry, ignore_index=True)
     df_grouped = df.groupby('frame') #group by image frame 
     return df_grouped
 
-def find_mask_on_MOT_images(image_folder,depth_folder, gt_folder):
+def find_mask_on_COCO_images(image_folder,depth_folder, gt_folder):
 
     df_stats = pd.DataFrame(columns=("Image","Depth_level","Useful_pixels(%)"))
     _, images = get_folder_images(image_folder)
@@ -124,7 +144,7 @@ def find_mask_on_MOT_images(image_folder,depth_folder, gt_folder):
 
     images = sorted(images)
     depths_ = sorted(depths_)
-    df_grouped = parse_MOT_gt(gt_file)
+    df_grouped = parse_COCO_gt(gt_file)
 
     for group,df_group in df_grouped:
         image_ = images[group-1]
