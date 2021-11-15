@@ -96,7 +96,11 @@ def find_mask(depth_array, img_file, bboxes, thresh=0.9):
 
         if percentage_covered >= thresh:
             found_mask = True
+            # print("depth level: ", depth_level)
+            break
+        
         depth_level -= 1
+        # print("depth_level outside: ", depth_level)
     return depth_level, mask_arr
 
 def parse_MOT_gt(gt_file):
