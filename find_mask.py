@@ -139,8 +139,8 @@ def find_mask_on_COCO_images(image_folder, gt_file):
     # get root folder
     root_folder = image_folder.split('/')[0]
 
-    output_path_masks = os.path.join(root_folder,"masks")
-    if not os.path.exists(output_path_masks): os.makedirs(output_path_masks)
+    # output_path_masks = os.path.join(root_folder,"masks")
+    # if not os.path.exists(output_path_masks): os.makedirs(output_path_masks)
 
     # images = sorted(images)
     images.sort()
