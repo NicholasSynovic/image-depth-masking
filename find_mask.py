@@ -231,15 +231,29 @@ def find_mask_on_COCO_images(image_folder, gt_file):
     stats = os.path.join(image_folder,'stats.csv')
     df_stats.to_csv(stats,index=False)
 
+import time
+from datetime import timedelta
 
+def start_time_measure(message=None):
+    if message:
+        print(message)
+    return time.monotonic()
+
+def end_time_measure(start_time, print_prefix=None):
+    end_time = time.monotonic()
+    if print_prefix:
+        print(print_prefix + str(timedelta(seconds=end_time - start_time)))
+    return end_time
 def main():
+    total_start_time = start_time_measure('Generating output...')    
+    # Do something
     args = get_argparse().parse_args()
     image_folder = args.image_folder
     # depth_folder = args.depth_folder
     gt_folder = args.gt_folder
-
     find_mask_on_COCO_images(image_folder,gt_folder)
 
+    end_time_measure(total_start_time, 'Total time elapsed:')
 
 if __name__ == "__main__":
     main()
