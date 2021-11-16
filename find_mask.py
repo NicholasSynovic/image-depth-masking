@@ -182,6 +182,7 @@ def find_mask_on_COCO_images(image_folder, gt_file):
         useful_pixels = (mask.size - np.count_nonzero(mask)) / mask.size
         # useful_pixels = round(useful_pixels,2)
         useful_pixels = useful_pixels*100
+        useful_pixels = round(useful_pixels,4)
 
         entry = {"Image": i, "Depth_level": depth_level, "Useful_pixels(%)": useful_pixels }
         df_stats = df_stats.append(entry, ignore_index=True)
