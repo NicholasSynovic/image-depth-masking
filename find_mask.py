@@ -165,7 +165,7 @@ def find_mask_on_COCO_images(image_folder, gt_file):
         bboxes = []
         cur_image_id = int(remove_ext(i))
         # get bounding boxes
-        print("IMAGE: ", image_)
+        # print("IMAGE: ", image_)
         while cur_image_id == int(images_boxes[boxes_index][0]):
             left = images_boxes[boxes_index][1][0]
             top = images_boxes[boxes_index][1][1]
@@ -173,11 +173,11 @@ def find_mask_on_COCO_images(image_folder, gt_file):
             height = images_boxes[boxes_index][1][3]
             bbox_points = [left,top,width,height]
             bboxes.append(bbox_points)
-            print(images_boxes[boxes_index], "InDEX: ", boxes_index)
+            # print(images_boxes[boxes_index], "InDEX: ", boxes_index)
             boxes_index += 1
             if boxes_index == end:
                 break
-        print("++++++++++++++++++++++++++++++")
+        # print("++++++++++++++++++++++++++++++")
         depth_level, mask = find_mask(depth_arr,image_,bboxes)
         useful_pixels = (mask.size - np.count_nonzero(mask)) / mask.size
         # useful_pixels = round(useful_pixels,2)
