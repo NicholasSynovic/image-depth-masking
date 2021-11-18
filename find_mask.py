@@ -157,6 +157,7 @@ def find_mask_on_COCO_images(image_folder, gt_file):
     # start processing images
     boxes_index = 0
     end = len(images_boxes)
+    percentage_done = 0 # for tracking progress
     for i in filtered_images:
         image_ = os.path.join(image_folder,i)
         midas, transform, device = get_midas(models[2])
@@ -189,6 +190,13 @@ def find_mask_on_COCO_images(image_folder, gt_file):
 
         image_name = os.path.splitext(image_)[0]
         image_name = image_name.split('/')[-1] 
+
+        percentage_done += 1
+        done = (percentage_done / len(filtered_images)) * 100
+        done = round(done,2)
+        print("================================")
+        print("PERCENTAGE OF IMAGES DONE: {}%".format(done))
+        print("================================")
         # output_mask = "depth_" + str(depth_level) + "_mask_" + image_name + ".csv"
         # output_mask = os.path.join(output_path_masks, output_mask)
         # np.savetxt(output_mask, mask, delimiter=",")
