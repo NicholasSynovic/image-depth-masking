@@ -6,6 +6,7 @@ import os
 import sys
 import numpy as np
 from PIL import Image
+from helper_funcs import get_folder_images
 # import os
 #TODO: update usage
 #TODO: write proper docs for all functions
@@ -85,14 +86,6 @@ def depth(img, midas, transform, device):
     return output
 
 
-def get_folder_images(folder_name):
-    """
-    Gets images from folder 
-    """
-    image_exts = (".jpg", ".jpeg", ".png")
-    images_path = [os.path.join(folder_name,_) for _ in os.listdir(folder_name) if _.lower().endswith(image_exts)]
-    images_ = [_ for _ in os.listdir(folder_name) if _.lower().endswith(image_exts)]
-    return images_path, images_
 
 # def output_depth_map_image_file(file_name,model):
 #     models = ["DPT_Large","DPT_Hybrid", "MiDaS_small"]

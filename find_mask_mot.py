@@ -7,7 +7,7 @@ import sys
 import numpy as np
 from PIL import Image
 import pandas as pd
-from main import get_folder_images
+from helper_funcs import get_folder_images
 #TODO: Write proper docs for all functions 
 def get_argparse():
     parser = ArgumentParser(
