@@ -7,7 +7,7 @@ import sys
 import numpy as np
 from PIL import Image
 import pandas as pd
-from main import get_folder_images, get_midas, depth
+from helper_funcs import get_folder_images, get_midas, depth
 import json
 #TODO: Write proper docs for all functions 
 def get_argparse():
