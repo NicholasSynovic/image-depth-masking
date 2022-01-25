@@ -7,7 +7,7 @@ import sys
 import numpy as np
 from PIL import Image
 import pandas as pd
-from main import get_folder_images, get_midas, depth
+from helper_funcs import get_folder_images, get_midas, depth
 import json
 #TODO: Write proper docs for all functions 
 def get_argparse():
@@ -157,6 +157,7 @@ def find_mask_on_COCO_images(image_folder, gt_file):
     # start processing images
     boxes_index = 0
     end = len(images_boxes)
+    percentage_done = 0 # for tracking progress
     for i in filtered_images:
         image_ = os.path.join(image_folder,i)
         midas, transform, device = get_midas(models[2])
@@ -189,6 +190,13 @@ def find_mask_on_COCO_images(image_folder, gt_file):
 
         image_name = os.path.splitext(image_)[0]
         image_name = image_name.split('/')[-1] 
+
+        percentage_done += 1
+        done = (percentage_done / len(filtered_images)) * 100
+        done = round(done,2)
+        print("================================")
+        print("PERCENTAGE OF IMAGES DONE: {}%".format(done))
+        print("================================")
         # output_mask = "depth_" + str(depth_level) + "_mask_" + image_name + ".csv"
         # output_mask = os.path.join(output_path_masks, output_mask)
         # np.savetxt(output_mask, mask, delimiter=",")
@@ -231,15 +239,29 @@ def find_mask_on_COCO_images(image_folder, gt_file):
     stats = os.path.join(image_folder,'stats.csv')
     df_stats.to_csv(stats,index=False)
 
+import time
+from datetime import timedelta
 
+def start_time_measure(message=None):
+    if message:
+        print(message)
+    return time.monotonic()
+
+def end_time_measure(start_time, print_prefix=None):
+    end_time = time.monotonic()
+    if print_prefix:
+        print(print_prefix + str(timedelta(seconds=end_time - start_time)))
+    return end_time
 def main():
+    total_start_time = start_time_measure('Generating output...')    
+    # Do something
     args = get_argparse().parse_args()
     image_folder = args.image_folder
     # depth_folder = args.depth_folder
     gt_folder = args.gt_folder
-
     find_mask_on_COCO_images(image_folder,gt_folder)
 
+    end_time_measure(total_start_time, 'Total time elapsed:')
 
 if __name__ == "__main__":
     main()
