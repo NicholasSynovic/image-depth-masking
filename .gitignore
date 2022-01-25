@@ -22,6 +22,6 @@ Session.vim
 *.jpeg
 *.png
 *.gif
-.csv
+*.csv
 *.txt
 *.json
