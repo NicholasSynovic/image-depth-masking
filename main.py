@@ -8,8 +8,6 @@ import numpy as np
 from PIL import Image
 from helper_funcs import get_folder_images, get_midas, depth
 # import os
-#TODO: update usage
-#TODO: write proper docs for all functions
 def get_argparse():
     parser = ArgumentParser(
         prog="Masking images with depth maps",
@@ -54,30 +52,6 @@ def get_argparse():
     )
     return parser
 
-
-
-
-# def output_depth_map_image_file(file_name,model):
-#     models = ["DPT_Large","DPT_Hybrid", "MiDaS_small"]
-#     output = "dept_map_" + models[model]+ "_" + file_name 
-#     midas, transform, device = get_midas(models[model])
-#     depth_ = depth(file_name, midas, transform, device)
-#     plt.imshow(depth_)
-#     plt.savefig(output)
-
-# def output_depth_map_image_folder(folder_name,model):
-#     models = ["DPT_Large","DPT_Hybrid", "MiDaS_small"]
-#     images_path, images_ = get_folder_images(folder_name)
-#     output_path =  "depth_maps_" + folder_name
-#     if not os.path.exists(output_path): os.makedirs(output_path)
-#
-#     for image_path,image_ in zip(images_path,images_):
-#         output = "dept_map_" + models[model]+ "_" + image_ 
-#         output = os.path.join(output_path,output)
-#         midas, transform, device = get_midas(models[model])
-#         depth_ = depth(image_path, midas, transform, device)
-#         plt.imshow(depth_)
-#         plt.savefig(output)
 
 # take folder of images and output the depth map of images into a folder of csv files
 def output_depth_map_array_folder(folder_name,model):

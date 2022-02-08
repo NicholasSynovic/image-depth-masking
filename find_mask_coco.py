@@ -77,14 +77,8 @@ def find_mask(depth_array, img_file, bboxes, thresh=0.9):
     gt_arr = np.zeros(shape_) #groundtruth map array
 
     fill_gt_bbox(gt_arr,bboxes) # populate bounding box with 1s
-    # print("BBOXES: ", bboxes)
-    # print("IMAGE: ", img_file)
     total_ones_gt = np.count_nonzero(gt_arr) # count 1s in groundtruth array
-    # print("UNIQUE: ", np.unique(gt_arr))
-    # print("SIZEE: ", gt_arr.size)
-    # print("TOTAL ONES: ", total_ones_gt)
     
-    # add to for loop
     found_mask = False
     depth_level = 9 # depth_level for trying depths
     mask_arr = []
@@ -111,23 +105,6 @@ def parse_COCO_gt(annotations_file):
     annotations = data['annotations']
     image_set = set(list(map(lambda x: x['image_id'], annotations))) # save set of images for optimized search
 
-    # use for sorting
-    # def take_first(item):
-    #     return item[0]
-    # images_boxes = sorted(list(map(lambda x: [x['image_id'], x['bbox']], annotations)),key=take_first)
-    # headers = ["frame","bb_left","bb_top","bb_width","bb_height"]
-    # df = pd.DataFrame(columns = headers)
-    #
-    # for i in images_boxes:
-    #     frame = i[0]
-    #     bb_left = i[1][0]
-    #     bb_top = i[1][1]
-    #     bb_width = i[1][2]
-    #     bb_height = i[1][3]
-    #     entry = {"frame": frame, "bb_left": bb_left, "bb_top": bb_top, "bb_width": bb_width, "bb_height": bb_height}
-    #
-    #     df = df.append(entry, ignore_index=True)
-    # df_grouped = df.groupby('frame') #group by image frame 
     return image_set, annotations
 
 def find_mask_on_COCO_images(image_folder, gt_file):
@@ -139,10 +116,6 @@ def find_mask_on_COCO_images(image_folder, gt_file):
     # get root folder
     root_folder = image_folder.split('/')[0]
 
-    # output_path_masks = os.path.join(root_folder,"masks")
-    # if not os.path.exists(output_path_masks): os.makedirs(output_path_masks)
-
-    # images = sorted(images)
     images.sort()
 
     image_set,annotations = parse_COCO_gt(gt_file)
@@ -165,8 +138,8 @@ def find_mask_on_COCO_images(image_folder, gt_file):
 
         bboxes = []
         cur_image_id = int(remove_ext(i))
+
         # get bounding boxes
-        # print("IMAGE: ", image_)
         while cur_image_id == int(images_boxes[boxes_index][0]):
             left = images_boxes[boxes_index][1][0]
             top = images_boxes[boxes_index][1][1]
@@ -174,14 +147,12 @@ def find_mask_on_COCO_images(image_folder, gt_file):
             height = images_boxes[boxes_index][1][3]
             bbox_points = [left,top,width,height]
             bboxes.append(bbox_points)
-            # print(images_boxes[boxes_index], "InDEX: ", boxes_index)
             boxes_index += 1
             if boxes_index == end:
                 break
-        # print("++++++++++++++++++++++++++++++")
+
         depth_level, mask = find_mask(depth_arr,image_,bboxes)
         useful_pixels = (mask.size - np.count_nonzero(mask)) / mask.size
-        # useful_pixels = round(useful_pixels,2)
         useful_pixels = useful_pixels*100
         useful_pixels = round(useful_pixels,4)
 
@@ -201,41 +172,6 @@ def find_mask_on_COCO_images(image_folder, gt_file):
         # output_mask = os.path.join(output_path_masks, output_mask)
         # np.savetxt(output_mask, mask, delimiter=",")
 
-    #################################################################################################################
-    # count = 0
-    # for group,df_group in df_grouped:
-    #     image_ = filtered_images[int(group-1)]
-    #     image_ = os.path.join(image_folder,image_)
-    #
-    #     midas, transform, device = get_midas(models[2])
-    #     depth_arr = depth(image_, midas, transform, device)
-    #     bboxes = []
-    #     
-    #     print("IMAGE: ", image_)
-    #     for row_index, row in df_group.iterrows():
-    #
-    #         print(row)
-    #         bbox_points = [row["bb_left"],row["bb_top"],row["bb_width"],row["bb_height"]]
-    #         # print("CURR IMAGE: ", image_)
-    #         # print("BBOX POINTS: ", bbox_points)
-    #         bboxes.append(bbox_points)
-    #
-    #     print("+++++++++++++++++++++++++++++")
-    #     depth_level, mask = find_mask(depth_arr,image_,bboxes)
-    #
-    #     useful_pixels = (mask.size - np.count_nonzero(mask)) / mask.size
-    #     # useful_pixels = round(useful_pixels,2)
-    #     useful_pixels = useful_pixels*100
-    #
-    #     entry = {"Image": group, "Depth_level": depth_level, "Useful_pixels(%)": useful_pixels }
-    #     df_stats = df_stats.append(entry, ignore_index=True)
-    #
-    #     image_name = os.path.splitext(image_)[0]
-    #     image_name = image_name.split('/')[-1] 
-    #     # output_mask = "depth_" + str(depth_level) + "_mask_" + image_name + ".csv"
-    #     # output_mask = os.path.join(output_path_masks, output_mask)
-    #     # np.savetxt(output_mask, mask, delimiter=",")
-
     stats = os.path.join(image_folder,'stats.csv')
     df_stats.to_csv(stats,index=False)
 
@@ -254,10 +190,8 @@ def end_time_measure(start_time, print_prefix=None):
     return end_time
 def main():
     total_start_time = start_time_measure('Generating output...')    
-    # Do something
     args = get_argparse().parse_args()
     image_folder = args.image_folder
-    # depth_folder = args.depth_folder
     gt_folder = args.gt_folder
     find_mask_on_COCO_images(image_folder,gt_folder)
 
