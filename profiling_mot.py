@@ -7,7 +7,7 @@ import sys
 import numpy as np
 from PIL import Image
 import pandas as pd
-from helper_funcs import get_folder_images
+from helper_funcs import get_folder_images, get_midas, depth
 #TODO: Write proper docs for all functions 
 def get_argparse():
     parser = ArgumentParser(
@@ -21,13 +21,7 @@ def get_argparse():
         type=str,
         required=True,
     )
-    parser.add_argument(
-        "-df",
-        "--depth_folder",
-        help="Depth map folder name",
-        type=str,
-        required=True,
-    )
+
     parser.add_argument(
         "-gt",
         "--gt_folder",
@@ -64,16 +58,16 @@ def make_gt_map(image,bboxes):
 
 # convert groundtruth bbox format '<bb_left>, <bb_top>, <bb_width>, <bb_height>' to proper index for array slicing
 def convert_bbox_to_slices(bbox):
-    top = bbox[1]
-    bottom = bbox[1] + bbox[3]+1
-    left = bbox[0]
-    right = bbox[0] + bbox[2]+1
+    top = int(bbox[1])
+    bottom = int(bbox[1] + bbox[3]+1)
+    left = int(bbox[0])
+    right = int(bbox[0] + bbox[2]+1)
     return top,bottom,left,right
 
 def fill_gt_bbox(gt_arr, bboxes):
-     for bbox in bboxes:
-         top,bottom,left,right = convert_bbox_to_slices(bbox)
-         gt_arr[top:bottom, left:right] = 1 # fill rectangle with ones
+    for bbox in bboxes:
+        top,bottom,left,right = convert_bbox_to_slices(bbox)
+        gt_arr[top:bottom, left:right] = 1 # fill rectangle with ones
 
     
 def find_mask(depth_array, img_file, bboxes, thresh=0.9): 
@@ -109,12 +103,13 @@ def parse_MOT_gt(gt_file):
     df_grouped = df.groupby('frame') #group by image frame 
     return df_grouped
 
-def find_mask_on_MOT_images(image_folder,depth_folder, gt_folder):
+def find_mask_on_MOT_images(image_folder,gt_file):
+    models = ["DPT_Large","DPT_Hybrid", "MiDaS_small"]
 
     df_stats = pd.DataFrame(columns=("Image","Depth_level","Useful_pixels(%)"))
     _, images = get_folder_images(image_folder)
-    depths_ = [_ for _ in os.listdir(depth_folder) if _.lower().endswith(".csv")] # get csv files
-    gt_file = os.path.join(gt_folder,'gt.txt')
+
+    # gt_file = os.path.join(gt_folder,'gt.txt') 
 
     # get root folder
     root_folder = image_folder.split('/')[0]
@@ -122,17 +117,15 @@ def find_mask_on_MOT_images(image_folder,depth_folder, gt_folder):
     output_path_masks = os.path.join(root_folder,"masks")
     if not os.path.exists(output_path_masks): os.makedirs(output_path_masks)
 
-    images = sorted(images)
-    depths_ = sorted(depths_)
-    df_grouped = parse_MOT_gt(gt_file)
+    images.sort()
+    df_grouped = parse_MOT_gt(gt_file) # get groundtruth
 
     for group,df_group in df_grouped:
         image_ = images[group-1]
         image_ = os.path.join(image_folder,image_)
 
-        depth_path = depths_[group-1]
-        depth_path = os.path.join(depth_folder,depth_path)
-        depth_arr = np.genfromtxt(depth_path,delimiter=',')
+        midas, transform, device = get_midas(models[2])
+        depth_arr = depth(image_, midas, transform, device)
         bboxes = []
         
         for row_index, row in df_group.iterrows():
@@ -150,9 +143,9 @@ def find_mask_on_MOT_images(image_folder,depth_folder, gt_folder):
 
         image_name = os.path.splitext(image_)[0]
         image_name = image_name.split('/')[-1] 
-        output_mask = "depth_" + str(depth_level) + "_mask_" + image_name + ".csv"
-        output_mask = os.path.join(output_path_masks, output_mask)
-        np.savetxt(output_mask, mask, delimiter=",")
+        # output_mask = "depth_" + str(depth_level) + "_mask_" + image_name + ".csv"
+        # output_mask = os.path.join(output_path_masks, output_mask)
+        # np.savetxt(output_mask, mask, delimiter=",")
 
     stats = os.path.join(image_folder,'stats.csv')
     df_stats.to_csv(stats,index=False)
@@ -161,10 +154,9 @@ def find_mask_on_MOT_images(image_folder,depth_folder, gt_folder):
 def main():
     args = get_argparse().parse_args()
     image_folder = args.image_folder
-    depth_folder = args.depth_folder
     gt_folder = args.gt_folder
 
-    find_mask_on_MOT_images(image_folder,depth_folder,gt_folder)
+    find_mask_on_MOT_images(image_folder,gt_folder)
 
 if __name__ == "__main__":
     main()
