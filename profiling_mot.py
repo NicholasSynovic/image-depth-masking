@@ -8,6 +8,7 @@ import numpy as np
 from PIL import Image
 import pandas as pd
 from helper_funcs import get_folder_images, get_midas, depth
+import timeit
 #TODO: Write proper docs for all functions 
 def get_argparse():
     parser = ArgumentParser(
@@ -96,12 +97,12 @@ def find_mask(depth_array, img_file, bboxes, thresh=0.9):
     return depth_level, mask_arr
 
 def parse_MOT_gt(gt_file):
-    headers = ["frame","id","bb_left","bb_top","bb_width","bb_height"]
-    df = pd.read_csv(gt_file,delimiter=",", header=None, usecols=list(range(0,6)))
-    df.columns = headers
+    headers = {"frame":0,"id":1,"bb_left":2,"bb_top":3,"bb_width":4,"bb_height":5} # map headers to column index 
+    data = np.loadtxt(gt_file, delimiter = ",",usecols=list(range(0,6)))
+    image_ids = np.unique(data[:,0])
+    print(image_ids)
 
-    df_grouped = df.groupby('frame') #group by image frame 
-    return df_grouped
+    return headers, data, image_ids
 
 def find_mask_on_MOT_images(image_folder,gt_file):
     models = ["DPT_Large","DPT_Hybrid", "MiDaS_small"]
@@ -113,36 +114,58 @@ def find_mask_on_MOT_images(image_folder,gt_file):
     # get root folder
     root_folder = image_folder.split('/')[0]
 
+    # output path for images with mask applied
+    output_path = "applied_mask"
+    output_path = os.path.join(root_folder,output_path)
+    if not os.path.exists(output_path): os.makedirs(output_path)
+    # =====================================
 
     images.sort()
-    df_grouped = parse_MOT_gt(gt_file) # get groundtruth
+    headers, data, image_ids = parse_MOT_gt(gt_file) # get groundtruth data
 
-    for group,df_group in df_grouped:
-        image_ = images[group-1]
-        image_ = os.path.join(image_folder,image_)
-
+    row_index = 0
+    end = np.shape(data)[0] # get row count
+    for i in range(len(images)):
+        image_ = os.path.join(image_folder,images[i])
         midas, transform, device = get_midas(models[2])
         depth_arr = depth(image_, midas, transform, device)
+
         bboxes = []
+        cur_image_id = image_ids[i]
+
+        # get bounding boxes
         
-        for row_index, row in df_group.iterrows():
-            bbox_points = [row["bb_left"],row["bb_top"],row["bb_width"],row["bb_height"]]
+        while cur_image_id == int(data[row_index][0]):
+            row = data[i]
+            left, top, width, height = row[headers["bb_left"]], row[headers["bb_top"]], row[headers["bb_width"]], row[headers["bb_height"]]
+            bbox_points = [left, top, width, height]
             bboxes.append(bbox_points)
+            row_index += 1
+            if row_index == end:
+                break
 
         depth_level, mask = find_mask(depth_arr,image_,bboxes)
+        # save images with mask applied
+        # img_ = Image.open(image_)
+        # img_arr = np.array(img_)
+        # img_arr[mask.astype(bool), :] = 0 # set pixel of mask:0 to black, leave the rest as original color
+        # image_no_ext = os.path.splitext(images[i])[0]
+        # output =  "masked_" + image_no_ext + ".jpg"
+        # output = os.path.join(output_path, output)
+        # plt.imshow(img_arr)
+        # plt.savefig(output)
+        # =====================================
+
 
         useful_pixels = (mask.size - np.count_nonzero(mask)) / mask.size
         # useful_pixels = round(useful_pixels,2)
         useful_pixels = useful_pixels*100
 
-        entry = {"Image": group, "Depth_level": depth_level, "Useful_pixels(%)": useful_pixels }
+        entry = {"Image": cur_image_id, "Depth_level": depth_level, "Useful_pixels(%)": useful_pixels }
         df_stats = df_stats.append(entry, ignore_index=True)
 
         image_name = os.path.splitext(image_)[0]
         image_name = image_name.split('/')[-1] 
-        # output_mask = "depth_" + str(depth_level) + "_mask_" + image_name + ".csv"
-        # output_mask = os.path.join(output_path_masks, output_mask)
-        # np.savetxt(output_mask, mask, delimiter=",")
 
     stats = os.path.join(image_folder,'stats.csv')
     df_stats.to_csv(stats,index=False)
@@ -153,7 +176,10 @@ def main():
     image_folder = args.image_folder
     gt_folder = args.gt_folder
 
+    start = timeit.default_timer()
     find_mask_on_MOT_images(image_folder,gt_folder)
+    stop = timeit.default_timer()
+    print("Time elapsed: ", stop - start )
 
 if __name__ == "__main__":
     main()
