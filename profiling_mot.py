@@ -109,13 +109,10 @@ def find_mask_on_MOT_images(image_folder,gt_file):
     df_stats = pd.DataFrame(columns=("Image","Depth_level","Useful_pixels(%)"))
     _, images = get_folder_images(image_folder)
 
-    # gt_file = os.path.join(gt_folder,'gt.txt') 
 
     # get root folder
     root_folder = image_folder.split('/')[0]
 
-    output_path_masks = os.path.join(root_folder,"masks")
-    if not os.path.exists(output_path_masks): os.makedirs(output_path_masks)
 
     images.sort()
     df_grouped = parse_MOT_gt(gt_file) # get groundtruth
