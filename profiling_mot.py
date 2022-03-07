@@ -100,7 +100,6 @@ def parse_MOT_gt(gt_file):
     headers = {"frame":0,"id":1,"bb_left":2,"bb_top":3,"bb_width":4,"bb_height":5} # map headers to column index 
     data = np.loadtxt(gt_file, delimiter = ",",usecols=list(range(0,6)))
     image_ids = np.unique(data[:,0])
-    print(image_ids)
 
     return headers, data, image_ids
 
