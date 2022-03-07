@@ -178,7 +178,11 @@ def main():
     start = timeit.default_timer()
     find_mask_on_MOT_images(image_folder,gt_folder)
     stop = timeit.default_timer()
+    time_elapsed = "Time elapsed: " + str(stop-start)
     print("Time elapsed: ", stop - start )
+    output_time = open("elapsed.txt","w")
+    output_time.write(time_elapsed)
+    output_time.close()
 
 if __name__ == "__main__":
     main()
