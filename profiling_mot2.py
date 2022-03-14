@@ -137,8 +137,6 @@ def find_mask_on_MOT_images(image_folder,gt_file):
     end = np.shape(data)[0] # get row count
     for i in range(len(images)):
         image_ = os.path.join(image_folder,images[i])
-        midas, transform, device = get_midas(models[2])
-        depth_arr = depth(image_, midas, transform, device)
 
         bboxes = []
         cur_image_id = image_ids[i]
@@ -164,10 +162,14 @@ def find_mask_on_MOT_images(image_folder,gt_file):
             if verify_gt(0.8, cur_mask, gt_arr, total_ones_gt):
                 frame_skips += 1
             else:
+                midas, transform, device = get_midas(models[2])
+                depth_arr = depth(image_, midas, transform, device)
                 cur_depth, cur_mask = find_mask(depth_arr,image_,bboxes, thresh=0.8)
                 skipped_frames.append(frame_skips) # store skipped frames 
                 frame_skips = 0 # reset frame counter
         else:
+            midas, transform, device = get_midas(models[2])
+            depth_arr = depth(image_, midas, transform, device)
             cur_depth, cur_mask = find_mask(depth_arr,image_,bboxes, thresh=0.8)
         # save images with mask applied
         # img_ = Image.open(image_)
@@ -194,6 +196,9 @@ def find_mask_on_MOT_images(image_folder,gt_file):
 
     stats = os.path.join(image_folder,'stats.csv')
     df_stats.to_csv(stats,index=False)
+
+    if frame_skips > 0:
+        skipped_frames.append(frame_skips)
 
     if len(skipped_frames) > 0:
         file = open("skipped_frames.txt", "w+")
