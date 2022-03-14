@@ -70,11 +70,6 @@ def fill_gt_bbox(gt_arr, bboxes):
         top,bottom,left,right = convert_bbox_to_slices(bbox)
         gt_arr[top:bottom, left:right] = 1 # fill rectangle with ones
 
-def verify_gt(thresh, mask_arr, gt_arr, total_ones_gt): 
-    output = np.logical_and(mask_arr,gt_arr)
-    output_ones = np.count_nonzero(output)
-    percentage_covered = (total_ones_gt - output_ones) / total_ones_gt
-    return percentage_covered >= thresh
     
 def find_mask(depth_array, img_file, bboxes, thresh=0.9): 
     im_ar = np.array(Image.open(img_file))
@@ -90,7 +85,11 @@ def find_mask(depth_array, img_file, bboxes, thresh=0.9):
     mask_arr = []
     while not found_mask:
         mask_arr = create_img_mask(depth_array, depth_level*0.1)
-        if verify_gt(thresh, mask_arr, gt_arr, total_ones_gt):
+        output = np.logical_and(mask_arr,gt_arr)
+        output_ones = np.count_nonzero(output)
+        percentage_covered = (total_ones_gt - output_ones) / total_ones_gt
+
+        if percentage_covered >= thresh:
             found_mask = True
             break
         
@@ -104,7 +103,15 @@ def parse_MOT_gt(gt_file):
 
     return headers, data, image_ids
 
+# check if current mask covers threshold percentage of groundtruth. Thresh -> (0.0 - 1.0)
+def verify_gt(thresh, mask_arr, gt_arr, total_ones_gt): 
+    output = np.logical_and(mask_arr,gt_arr)
+    output_ones = np.count_nonzero(output)
+    percentage_covered = (total_ones_gt - output_ones) / total_ones_gt
+    return percentage_covered >= thresh
+
 def find_mask_on_MOT_images(image_folder,gt_file):
+    skipped_frames = []
     models = ["DPT_Large","DPT_Hybrid", "MiDaS_small"]
 
     df_stats = pd.DataFrame(columns=("Image","Depth_level","Useful_pixels(%)"))
@@ -115,15 +122,18 @@ def find_mask_on_MOT_images(image_folder,gt_file):
     root_folder = image_folder.split('/')[0]
 
     # output path for images with mask applied
-    # output_path = "applied_mask"
-    # output_path = os.path.join(root_folder,output_path)
-    # if not os.path.exists(output_path): os.makedirs(output_path)
+    output_path = "applied_mask"
+    output_path = os.path.join(root_folder,output_path)
+    if not os.path.exists(output_path): os.makedirs(output_path)
     # =====================================
 
     images.sort()
     headers, data, image_ids = parse_MOT_gt(gt_file) # get groundtruth data
 
     row_index = 0
+
+    cur_depth, cur_mask = None, None # keep track of current depth and current mask
+    frame_skips = 0 # track number of frame skips(reused mask on multiple frames)
     end = np.shape(data)[0] # get row count
     for i in range(len(images)):
         image_ = os.path.join(image_folder,images[i])
@@ -144,7 +154,21 @@ def find_mask_on_MOT_images(image_folder,gt_file):
             if row_index == end:
                 break
 
-        depth_level, mask = find_mask(depth_arr,image_,bboxes, thresh=0.8)
+        # try reusing mask of previous image
+        if i > 0:
+            im_ar = np.array(Image.open(image_))
+            shape_ = im_ar.shape[0:2]
+            gt_arr = np.zeros(shape_) #groundtruth map array
+            fill_gt_bbox(gt_arr,bboxes) # populate bounding box with 1s
+            total_ones_gt = np.count_nonzero(gt_arr) # count 1s in groundtruth array
+            if verify_gt(0.8, cur_mask, gt_arr, total_ones_gt):
+                frame_skips += 1
+            else:
+                cur_depth, cur_mask = find_mask(depth_arr,image_,bboxes, thresh=0.8)
+                skipped_frames.append(frame_skips) # store skipped frames 
+                frame_skips = 0 # reset frame counter
+        else:
+            cur_depth, cur_mask = find_mask(depth_arr,image_,bboxes, thresh=0.8)
         # save images with mask applied
         # img_ = Image.open(image_)
         # img_arr = np.array(img_)
@@ -158,11 +182,11 @@ def find_mask_on_MOT_images(image_folder,gt_file):
 
 
         # CALCULATING USEFUL PIXELS ======================
-        useful_pixels = (mask.size - np.count_nonzero(mask)) / mask.size
+        useful_pixels = (cur_mask.size - np.count_nonzero(cur_mask)) / cur_mask.size
         # useful_pixels = round(useful_pixels,2)
         useful_pixels = useful_pixels*100
 
-        entry = {"Image": cur_image_id, "Depth_level": depth_level, "Useful_pixels(%)": useful_pixels }
+        entry = {"Image": cur_image_id, "Depth_level": cur_depth, "Useful_pixels(%)": useful_pixels }
         df_stats = df_stats.append(entry, ignore_index=True)
 
         image_name = os.path.splitext(image_)[0]
@@ -170,6 +194,14 @@ def find_mask_on_MOT_images(image_folder,gt_file):
 
     stats = os.path.join(image_folder,'stats.csv')
     df_stats.to_csv(stats,index=False)
+
+    if len(skipped_frames) > 0:
+        file = open("skipped_frames.txt", "w+")
+        content = str(skipped_frames)
+        file.write(content)
+        file.close()
+    # skipped_output = np.array(skipped_frames)
+    # np.savetxt("skipped_frames.txt", skipped_output)
 
 
 def main():
