@@ -122,9 +122,9 @@ def find_mask_on_MOT_images(image_folder,gt_file):
     root_folder = image_folder.split('/')[0]
 
     # output path for images with mask applied
-    output_path = "applied_mask"
-    output_path = os.path.join(root_folder,output_path)
-    if not os.path.exists(output_path): os.makedirs(output_path)
+    # output_path = "applied_mask"
+    # output_path = os.path.join(root_folder,output_path)
+    # if not os.path.exists(output_path): os.makedirs(output_path)
     # =====================================
 
     images.sort()
@@ -174,7 +174,7 @@ def find_mask_on_MOT_images(image_folder,gt_file):
         # save images with mask applied
         # img_ = Image.open(image_)
         # img_arr = np.array(img_)
-        # img_arr[mask.astype(bool), :] = 0 # set pixel of mask:0 to black, leave the rest as original color
+        # img_arr[cur_mask.astype(bool), :] = 0 # set pixel of cur_mask:0 to black, leave the rest as original color
         # image_no_ext = os.path.splitext(images[i])[0]
         # output =  "masked_" + image_no_ext + ".jpg"
         # output = os.path.join(output_path, output)
