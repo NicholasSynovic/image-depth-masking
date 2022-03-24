@@ -120,7 +120,6 @@ def find_mask_on_MOT_images(image_folder,gt_file):
 
     # get root folder
     root_folder = image_folder.split('/')[0]
-
     # output path for images with mask applied
     # output_path = "applied_mask"
     # output_path = os.path.join(root_folder,output_path)

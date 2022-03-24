@@ -154,7 +154,7 @@ def find_mask_on_MOT_images(image_folder,gt_file):
         # output = os.path.join(output_path, output)
         # plt.imshow(img_arr)
         # plt.savefig(output)
-        # =====================================
+        # # =====================================
 
 
         # CALCULATING USEFUL PIXELS ======================

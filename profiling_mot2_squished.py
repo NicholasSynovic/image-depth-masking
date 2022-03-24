@@ -96,25 +96,29 @@ def find_mask(depth_array, img_file, bboxes, thresh=0.9):
     
     # add to for loop
     found_mask = False
-    depth_level = 2 # depth_level for trying depths
+    depth_level = 9 # depth_level for trying depths
     mask_arr = []
     while not found_mask:
         mask_arr = create_img_mask(depth_array, (depth_level*0.1))
-        print("CURR DEPTH: ", depth_level)
-        im_ar[mask_arr.astype(bool), :] = 0 # set pixel of cur_mask:0 to black, leave the rest as original color
-        plt.imshow(im_ar)
-        plt.show()
-        sys.exit(0)
-        output = np.logical_and(mask_arr,gt_arr)
-        output_ones = np.count_nonzero(output)
-        percentage_covered = (total_ones_gt - output_ones) / total_ones_gt
-
-        if percentage_covered >= thresh:
+        if verify_gt(thresh, mask_arr, gt_arr, total_ones_gt):
             found_mask = True
             break
         
         depth_level -= 1
-    return depth_level, mask_arr
+
+    depth_level_rev = 0
+    prev_mask = mask_arr # store that most recent mask covering threshold gt
+    ## Squishing, reduce aoi more by masking reverse depth until can't reduce AOI anymore
+    # stop at depth 6
+    while verify_gt(thresh, mask_arr, gt_arr, total_ones_gt) and depth_level_rev < 7:
+        prev_mask = mask_arr
+        reversed_depth_mask = create_img_mask_reversed(depth_array, (depth_level_rev*0.1))
+        mask_arr = mask_arr + reversed_depth_mask 
+        depth_level_rev += 1
+
+
+
+    return depth_level, prev_mask
 
 def parse_MOT_gt(gt_file):
     headers = {"frame":0,"id":1,"bb_left":2,"bb_top":3,"bb_width":4,"bb_height":5} # map headers to column index 
@@ -142,9 +146,9 @@ def find_mask_on_MOT_images(image_folder,gt_file):
     root_folder = image_folder.split('/')[0]
 
     # output path for images with mask applied
-    # output_path = "applied_mask"
-    # output_path = os.path.join(root_folder,output_path)
-    # if not os.path.exists(output_path): os.makedirs(output_path)
+    output_path = "applied_mask"
+    output_path = os.path.join(root_folder,output_path)
+    if not os.path.exists(output_path): os.makedirs(output_path)
     # =====================================
 
     images.sort()
@@ -185,21 +189,23 @@ def find_mask_on_MOT_images(image_folder,gt_file):
                 midas, transform, device = get_midas(models[2])
                 depth_arr = depth(image_, midas, transform, device)
                 cur_depth, cur_mask = find_mask(depth_arr,image_,bboxes, thresh=0.8)
-                skipped_frames.append(frame_skips) # store skipped frames 
-                frame_skips = 0 # reset frame counter
+                if frame_skips > 0:
+                    skipped_frames.append(frame_skips) # store skipped frames 
+                    frame_skips = 0 # reset frame counter
+
         else:
             midas, transform, device = get_midas(models[2])
             depth_arr = depth(image_, midas, transform, device)
             cur_depth, cur_mask = find_mask(depth_arr,image_,bboxes, thresh=0.8)
         # save images with mask applied
-        # img_ = Image.open(image_)
-        # img_arr = np.array(img_)
-        # img_arr[cur_mask.astype(bool), :] = 0 # set pixel of cur_mask:0 to black, leave the rest as original color
-        # image_no_ext = os.path.splitext(images[i])[0]
-        # output =  "masked_" + image_no_ext + ".jpg"
-        # output = os.path.join(output_path, output)
-        # plt.imshow(img_arr)
-        # plt.savefig(output)
+        img_ = Image.open(image_)
+        img_arr = np.array(img_)
+        img_arr[cur_mask.astype(bool), :] = 0 # set pixel of cur_mask:0 to black, leave the rest as original color
+        image_no_ext = os.path.splitext(images[i])[0]
+        output =  "masked_" + image_no_ext + ".jpg"
+        output = os.path.join(output_path, output)
+        plt.imshow(img_arr)
+        plt.savefig(output)
         # =====================================
 
 
