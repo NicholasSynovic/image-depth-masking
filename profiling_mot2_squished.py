@@ -145,10 +145,10 @@ def find_mask_on_MOT_images(image_folder,gt_file):
     # get root folder
     root_folder = image_folder.split('/')[0]
 
-    # output path for images with mask applied
-    output_path = "applied_mask"
-    output_path = os.path.join(root_folder,output_path)
-    if not os.path.exists(output_path): os.makedirs(output_path)
+    # # output path for images with mask applied
+    # output_path = "applied_mask"
+    # output_path = os.path.join(root_folder,output_path)
+    # if not os.path.exists(output_path): os.makedirs(output_path)
     # =====================================
 
     images.sort()
@@ -198,14 +198,14 @@ def find_mask_on_MOT_images(image_folder,gt_file):
             depth_arr = depth(image_, midas, transform, device)
             cur_depth, cur_mask = find_mask(depth_arr,image_,bboxes, thresh=0.8)
         # save images with mask applied
-        img_ = Image.open(image_)
-        img_arr = np.array(img_)
-        img_arr[cur_mask.astype(bool), :] = 0 # set pixel of cur_mask:0 to black, leave the rest as original color
-        image_no_ext = os.path.splitext(images[i])[0]
-        output =  "masked_" + image_no_ext + ".jpg"
-        output = os.path.join(output_path, output)
-        plt.imshow(img_arr)
-        plt.savefig(output)
+        # img_ = Image.open(image_)
+        # img_arr = np.array(img_)
+        # img_arr[cur_mask.astype(bool), :] = 0 # set pixel of cur_mask:0 to black, leave the rest as original color
+        # image_no_ext = os.path.splitext(images[i])[0]
+        # output =  "masked_" + image_no_ext + ".jpg"
+        # output = os.path.join(output_path, output)
+        # plt.imshow(img_arr)
+        # plt.savefig(output)
         # =====================================
 
 
