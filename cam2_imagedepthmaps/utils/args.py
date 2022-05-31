@@ -1,4 +1,5 @@
-from argparse import ArgumentParser, Namespace
+from argparse import ArgumentParser, HelpFormatter, Namespace
+from operator import attrgetter
 
 from cam2_imagedepthmaps.utils.version import version
 
@@ -9,6 +10,11 @@ authors: list = [
 ]
 versionString: str = name.format(version())
 
+class SortingHelpFormatter(HelpFormatter):
+    def add_arguments(self, actions):
+        actions = sorted(actions, key=attrgetter('option_strings'))
+        super(SortingHelpFormatter, self).add_arguments(actions)
+
 
 def maskArgs() -> Namespace:
     parser = ArgumentParser(
@@ -16,6 +22,7 @@ def maskArgs() -> Namespace:
         usage="Find masks for images from the COCO Dataset",
         description="",
         epilog=f"Tool created by {','.join(authors)}",
+        formatter_class=SortingHelpFormatter,
     )
     parser.add_argument(
         "-i",
