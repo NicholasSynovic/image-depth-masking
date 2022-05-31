@@ -22,11 +22,11 @@ torch = "^1.11.0"
 
 [tool.poetry.dev-dependencies]
 autoflake = "^1.4"
-bandit = "^1.7.4"
 black = "^22.3.0"
-flake8 = "^4.0.1"
 isort = "^5.10.1"
+bandit = "^1.7.4"
 mypy = "^0.950"
+flake8 = "^4.0.1"
 pylint = "^2.13.9"
 pytest = "^5.2"
 lxml = "^4.8.0"
@@ -39,3 +39,11 @@ lxml = "^4.8.0"
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 79
+
+[tool.isort]
+
+[tool.mypy]
+ignore_missing_imports = true
