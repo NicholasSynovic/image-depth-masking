@@ -1,3 +1,7 @@
+"""
+Code to handle command line arguments
+"""
+
 from argparse import ArgumentParser, HelpFormatter, Namespace
 from operator import attrgetter
 
