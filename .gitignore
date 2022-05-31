@@ -1,14 +1,14 @@
-# Python Files 
+# Python Files
 __pycache__
 *.ipynb_checkpoints
 *.ipynb
 
-# OsX Files 
+# OsX Files
 .DS_Store
 
 # vim stuff{{{
 .vim/
-    
+
 # swap
 [._]*.s[a-w][a-z]
 [._]s[a-w][a-z]
@@ -25,3 +25,5 @@ Session.vim
 *.csv
 *.txt
 *.json
+
+.mypy_cache

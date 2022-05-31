@@ -119,7 +119,9 @@ def parse_COCO_gt(annotations_file):
 def find_mask_on_COCO_images(image_folder, gt_file):
     models = ["DPT_Large", "DPT_Hybrid", "MiDaS_small"]
 
-    df_stats = pd.DataFrame(columns=("Image", "Depth_level", "Useful_pixels(%)"))
+    df_stats = pd.DataFrame(
+        columns=("Image", "Depth_level", "Useful_pixels(%)")
+    )
     _, images = get_folder_images(image_folder)
 
     # get root folder
@@ -140,7 +142,8 @@ def find_mask_on_COCO_images(image_folder, gt_file):
         return item[0]
 
     images_boxes = sorted(
-        list(map(lambda x: [x["image_id"], x["bbox"]], annotations)), key=take_first
+        list(map(lambda x: [x["image_id"], x["bbox"]], annotations)),
+        key=take_first,
     )
     # start processing images
     boxes_index = 0
