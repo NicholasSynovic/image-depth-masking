@@ -5,6 +5,8 @@
 filename=$(basename -- "$fullfile")
 filename="${filename%.*}"
 
+mkdir checks
+
 # Code formatters
 poetry run autoflake --in-place --remove-all-unused-imports --remove-duplicate-keys --remove-unused-variables $1
 poetry run black $1
