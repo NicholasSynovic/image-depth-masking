@@ -8,27 +8,31 @@ from pathlib import Path, PosixPath
 
 def getImagesInFolder(folderPath: str) -> tuple | bool:
     """
-    getImagesInFolder returns a list containing all image paths.
+    getImagesInFolder returns a tuple containing all image paths and filenames.
 
-    getImagesInFolder returns a list containing a all valid image paths. A valid image path is only if the file ends in: `.jpg`, `.jpeg`, `.png`.
+    getImagesInFolder returns a tuple of lists containing all valid image paths and filenames. A valid image path is only if the file ends in: `.jpg`, `.jpeg`, `.png`.
 
     A False `bool` is returned if the folder is invalid.
 
     :param folderPath: A folder path
     :type folderPath: str
-    :return: A list of the valid image paths or a False `bool`
-    :rtype: list | bool
+    :return: A tuple of the valid image paths and filenames or a False `bool`
+    :rtype: tuple | bool
     """
     if not os.path.isdir(folderPath):
         return False
 
     imagePaths: list = []
+    filenames: list = []
     extensions: tuple = (".jpg", ".jpeg", ".png")
     path: Path = Path(folderPath)
 
     obj: PosixPath
     for obj in path.iterdir():
         if obj.is_file() and obj.suffix in extensions:
-            imagePaths.append(obj.absolute())
+            imagePaths.append(obj.absolute().__str__())
+            filenames.append(obj.name)
 
-    return imagePaths
+    return (imagePaths, filenames)
+
+print(getImagesInFolder("."))
