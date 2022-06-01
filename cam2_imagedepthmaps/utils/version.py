@@ -1,3 +1,6 @@
+"""
+Code to handle application version
+"""
 version: str = "0.0.1"
 
 def __version__()   -> str:
