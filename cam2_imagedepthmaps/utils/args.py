@@ -88,5 +88,12 @@ def maskArgs() -> Namespace:
         type=str,
         required=True,
     )
-
+    parser.add_argument(
+        "-m",
+        "--model",
+        help="A MiDaS compatible model. Supported arguements are: 'DPT_Large', 'DPT_Hybrid', 'MiDaS_small'. DEFAULT: 'MiDaS_small'.",
+        type=str,
+        required=False,
+        default="MiDaS_small",
+    )
     return parser.parse_args()
