@@ -3,7 +3,8 @@ Code to handle application version
 """
 __version__: str = "0.0.1"
 
-def version()   -> str:
+
+def version() -> str:
     """
     __version__ returns the version of the application.
 
