@@ -1,12 +1,13 @@
 from argparse import Namespace
 
 from numpy import ndarray
-from pandas import DataFrame
+from pandas import DataFrame, Series
 from progress.bar import Bar
 
 from cam2_imagedepthmaps.utils.args import maskArgs
 from cam2_imagedepthmaps.utils.files import getImagesInFolder, loadJSONData
 from cam2_imagedepthmaps.utils.models import loadMiDaS, runMiDaS
+from cam2_imagedepthmaps.utils.masking import findMask
 
 # def create_img_mask(depth_array, threshold):
 #     """
@@ -117,7 +118,7 @@ def main():
         jsonFilePath=args.coco_annotations_file
     )
 
-    imageIDs: list = annotations["image_id"].to_list()
+    imageIDs: list = annotations["image_id"].unique().tolist()
 
     midasData: tuple = loadMiDaS(modelType=args.model)
 
@@ -125,12 +126,14 @@ def main():
         id: int
         for id in imageIDs:
             imagePath: str = imageFolder[id]["path"]
+            boundingBoxs: Series = annotations[annotations["image_id"] == id]["bbox"]
             depth: ndarray = runMiDaS(
                 imagePath=imagePath,
                 midas=midasData[0],
                 device=midasData[1],
                 transform=midasData[2],
             )
+            findMask(imagePath=imagePath, boundingBoxs=boundingBoxs, depth=depth, depthLevel=0.9, threshold=0.9)
 
             bar.next()
 
