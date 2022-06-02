@@ -2,10 +2,16 @@
 Code to load in models from model hubs
 """
 
-from typing import Any
-import torch
 
-def loadMiDaS(modelType: str, forceCPU: bool = True) ->  tuple:
+from typing import Any
+
+import cv2
+import torch
+from numpy import ndarray
+from torch import Tensor
+
+
+def loadMiDaS(modelType: str, forceCPU: bool = True) -> tuple:
     """
     loadMiDaS loads a MiDaS model type from the PyTorch model hub.
 
@@ -22,13 +28,19 @@ def loadMiDaS(modelType: str, forceCPU: bool = True) ->  tuple:
     midas: Any = torch.hub.load("intel-isl/MiDaS", modelType, verbose=False)
 
     print(f"Loading and validating intel-isl/MiDaS transforms for PyTorch...")
-    midasTransforms = torch.hub.load("intel-isl/MiDaS", "transforms", verbose=False)
+    midasTransforms = torch.hub.load(
+        "intel-isl/MiDaS", "transforms", verbose=False
+    )
 
     device: Any
     if forceCPU:
         device = torch.device("cpu")
     else:
-        device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+        device = (
+            torch.device("cuda")
+            if torch.cuda.is_available()
+            else torch.device("cpu")
+        )
 
     midas.to(device)
 
@@ -38,3 +50,26 @@ def loadMiDaS(modelType: str, forceCPU: bool = True) ->  tuple:
         transform: Any = midasTransforms.small_transform
 
     return (midas, device, transform)
+
+
+def runMiDaS(
+    imagePath: str, midas: Any, device: Any, transform: Any
+) -> ndarray:
+    image: ndarray = cv2.imread(filename=imagePath)
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
+    transformedImage: Tensor = transform(image).to(device)
+
+    with torch.no_grad():
+        prediction = midas(transformedImage)
+        prediction = torch.nn.functional.interpolate(
+            prediction.unsqueeze(1),
+            size=image.shape[:2],
+            mode="bicubic",
+            align_corners=False,
+        ).squeeze()
+
+    return prediction.cpu().numpy()
+
+
+# runMiDaS(imagePath="COCO/2014/train2014/COCO_train2014_000000000009.jpg")
