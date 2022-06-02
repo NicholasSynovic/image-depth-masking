@@ -44,9 +44,24 @@ def getImagesInFolder(folderPath: str) -> tuple | bool:
     return (imagePaths, filenames, strippedFilenames)
 
 
-def getGroundTruthData(jsonFilePath: str)   ->  dict:
-    groundTruthFile: TextIOWrapper
-    with open(jsonFilePath, "r") as groundTruthFile:
-        jsonData: dict = json.load(groundTruthFile)
-        groundTruthFile.close()
-    return jsonData
+def loadJSONData(jsonFilePath: str)   ->  DataFrame | bool:
+    """
+    loadJSONData loads a COCO annotations JSON file.
+
+    loadJSONData loads a COCO annotations JSON file and returns a pandas DataFrame object if it has a "bbox" (bounding box) key. Else, a False boolean is returned
+
+    :param jsonFilePath: filepath to the COCO annotations file.
+    :type jsonFilePath: str
+    :return: Either a DataFrame if it is a valid or usable COCO file, or a False boolean
+    :rtype: DataFrame | bool
+    """
+    jsonFile: TextIOWrapper
+    with open(jsonFilePath, "r") as jsonFile:
+        jsonData: dict = json.load(jsonFile)
+        jsonFile.close()
+
+    df: DataFrame = DataFrame(jsonData["annotations"])
+
+    if df.columns.__contains__("bbox"):
+        return df
+    return False
