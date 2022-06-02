@@ -9,10 +9,11 @@ from cam2_imagedepthmaps.utils.version import version
 
 name: str = "cam2 Image Depth Maps: {}"
 authors: list = [
-    "Emmanual Amobi <amobisomto@gmail.com>",
     "Nicholas M. Synovic <nicholas.synovic@gmail.com",
+    "Emmanual Amobi <amobisomto@gmail.com>",
 ]
 versionString: str = name.format(version())
+
 
 class SortingHelpFormatter(HelpFormatter):
     """
@@ -31,11 +32,11 @@ class SortingHelpFormatter(HelpFormatter):
         :param actions: an Iterable of Actions to be sorted alphabetically.
         :type actions: Iterable[Action]
         """
-        actions = sorted(actions, key=attrgetter('option_strings'))
+        actions = sorted(actions, key=attrgetter("option_strings"))
         super(SortingHelpFormatter, self).add_arguments(actions)
 
 
-def versionArgument(parser: ArgumentParser) ->  None:
+def versionArgument(parser: ArgumentParser) -> None:
     """
     versionArgument adds the generic version text to ArgumentParsers.
 
@@ -58,17 +59,17 @@ def maskArgs() -> Namespace:
     :return: A Namespace containing the users input
     :rtype: Namespace
     """
-    parser:ArgumentParser = ArgumentParser(
+    parser: ArgumentParser = ArgumentParser(
         prog=name.format("COCO Mask Finder"),
-        usage="Find masks for images from the COCO Dataset",
+        usage="Find masks for images from the COCO Dataset,",
         description="",
-        epilog=f"Tool created by {','.join(authors)}",
+        epilog=f"Tool created by {','.join(authors)}.",
         formatter_class=SortingHelpFormatter,
     )
     parser.add_argument(
         "-i",
-        "--image-folder",
-        help="image folder name",
+        "--coco-image-folder",
+        help="A path pointing to a folder of images from either the 2014 or 2017 COCO dataset.",
         type=str,
         required=True,
     )
@@ -80,5 +81,12 @@ def maskArgs() -> Namespace:
         required=True,
     )
     versionArgument(parser=parser)
+    parser.add_argument(
+        "-c",
+        "--coco-annotations-file",
+        help="A COCO annotations file in JSON format",
+        type=str,
+        required=True,
+    )
 
     return parser.parse_args()
