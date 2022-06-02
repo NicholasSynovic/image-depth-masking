@@ -105,19 +105,9 @@ def findMasks(imageFolder: str, groundTruthFolder: str):
     folder: tuple = getImagesInFolder(folderPath=imageFolder)
     imagePaths: list = folder[0]
     filenames: list = folder[1]
-
-    _, images = get_folder_images(imageFolder)
-
-    images.sort()
+    strippedFilenames: list = folder[2].sort()
 
     image_set, annotations = parse_COCO_gt(groundTruthFolder)
-    # helper
-    def remove_ext(file_):
-        return file_.split(".")[0]
-
-    filtered_images = [
-        im for im in images if int(remove_ext(im)) in image_set
-    ]  # ignore images without annotations
 
     def take_first(item):
         return item[0]
