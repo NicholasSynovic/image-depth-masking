@@ -10,7 +10,7 @@ from PIL import Image
 from pandas import DataFrame
 
 from cam2_imagedepthmaps.utils.args import maskArgs
-from cam2_imagedepthmaps.utils.files import getImagesInFolder
+from cam2_imagedepthmaps.utils.files import getImagesInFolder, loadJSONData
 from helper_funcs import depth, get_folder_images, get_midas
 
 
@@ -98,14 +98,16 @@ def parse_COCO_gt(annotations_file):
     return image_set, annotations
 
 
-def findMasks(imageFolder: str, groundTruthFolder: str):
+def findMasks(imageFolder: str, groundTruthFolder: str, jsonFilePath: str):
     stats: list = []
     models: list = ["DPT_Large", "DPT_Hybrid", "MiDaS_small"]
 
     folder: tuple = getImagesInFolder(folderPath=imageFolder)
     imagePaths: list = folder[0]
     filenames: list = folder[1]
-    strippedFilenames: list = folder[2].sort()
+    strippedFilenames: list = folder[2]
+
+    annotations: DataFrame = loadJSONData(jsonFilePath=jsonFilePath)
 
     image_set, annotations = parse_COCO_gt(groundTruthFolder)
 
@@ -171,6 +173,15 @@ def findMasks(imageFolder: str, groundTruthFolder: str):
 
 def main():
     args: Namespace = maskArgs()
+
+    imageFolder: tuple = getImagesInFolder(folderPath=args.image_folder)
+    imagePaths: list = imageFolder[0]
+    filenames: list = imageFolder[1]
+    strippedFilenames: list = imageFolder[2]
+
+    annotations: DataFrame = loadJSONData(jsonFilePath=args.coco_annotations)
+
+
 
     startTime: float = time.monotonic()
     findMasks(imageFolder=args.image_folder, groundTruthFolder=args.ground_truth_folder)
