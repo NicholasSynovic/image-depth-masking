@@ -8,7 +8,7 @@ from io import TextIOWrapper
 from pathlib import Path, PosixPath
 
 from pandas import DataFrame
-
+from progress.spinner import Spinner
 
 def getImagesInFolder(folderPath: str) -> dict | bool:
     """
@@ -31,13 +31,15 @@ def getImagesInFolder(folderPath: str) -> dict | bool:
     extensions: tuple = (".jpg", ".jpeg", ".png")
     path: Path = Path(folderPath)
 
-    obj: PosixPath
-    for obj in path.iterdir():
-        if obj.is_file() and obj.suffix in extensions:
-            data[int(obj.with_suffix("").name.split("_")[-1])] = {
-                "path": obj.absolute().__str__(),
-                "filename": obj.name,
-            }
+    with Spinner(f"Finding all valid images in {folderPath}...") as spinner:
+        obj: PosixPath
+        for obj in path.iterdir():
+            if obj.is_file() and obj.suffix in extensions:
+                data[int(obj.with_suffix("").name.split("_")[-1])] = {
+                    "path": obj.absolute().__str__(),
+                    "filename": obj.name,
+                }
+            spinner.next()
 
     return data
 
@@ -53,6 +55,7 @@ def loadJSONData(jsonFilePath: str) -> DataFrame | bool:
     :return: Either a DataFrame if it is a valid or usable COCO file, or a False boolean
     :rtype: DataFrame | bool
     """
+    print(f"Loading {jsonFilePath} into memory... ")
     jsonFile: TextIOWrapper
     with open(jsonFilePath, "r") as jsonFile:
         jsonData: dict = json.load(jsonFile)
