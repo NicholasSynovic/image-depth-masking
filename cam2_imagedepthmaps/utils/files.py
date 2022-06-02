@@ -10,6 +10,7 @@ from pathlib import Path, PosixPath
 from pandas import DataFrame
 from progress.spinner import Spinner
 
+
 def getImagesInFolder(folderPath: str) -> dict | bool:
     """
     getImagesInFolder returns a dict containing all image paths and filenames.

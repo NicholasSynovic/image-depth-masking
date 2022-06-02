@@ -1,9 +1,12 @@
 import numpy
 from numpy import ndarray
-from PIL import Image
 from pandas import Series
+from PIL import Image
 
-def sliceGroundTruthByBoundingBoxs(groundTruth: ndarray, boundingBoxs: Series)  ->  ndarray:
+
+def sliceGroundTruthByBoundingBoxs(
+    groundTruth: ndarray, boundingBoxs: Series
+) -> ndarray:
     boundingBox: list
     for boundingBox in boundingBoxs:
         rowIndex0: float = boundingBox[1]
@@ -18,18 +21,29 @@ def sliceGroundTruthByBoundingBoxs(groundTruth: ndarray, boundingBoxs: Series)  
         groundTruth[rowIndex0:rowIndexN, columnIndex0:columnIndexN] = 1
     return groundTruth
 
-def createMask(depth: ndarray, depthLevel: float)   ->  ndarray:
+
+def createMask(depth: ndarray, depthLevel: float) -> tuple:
     maximum: float = numpy.amax(depth)
     thresholdValue: float = depthLevel * maximum
     return numpy.where(depth >= thresholdValue, False, True)
 
-def findMask(imagePath: str, boundingBoxs: Series, depth: ndarray, depthLevel:float=0.9, threshold: float=0.9, depthLevelDecline: float = 0.1):
+
+def findMask(
+    imagePath: str,
+    boundingBoxs: Series,
+    depth: ndarray,
+    depthLevel: float = 0.9,
+    threshold: float = 0.9,
+    depthLevelDecline: float = 0.1,
+) -> tuple[float, ndarray, float, float, float]:
     image: ndarray = numpy.array(Image.open(imagePath))
 
     imageShape: tuple = image.shape[0:2]
     groundTruth: ndarray = numpy.zeros(imageShape)
 
-    groundTruth = sliceGroundTruthByBoundingBoxs(groundTruth=groundTruth, boundingBoxs=boundingBoxs)
+    groundTruth = sliceGroundTruthByBoundingBoxs(
+        groundTruth=groundTruth, boundingBoxs=boundingBoxs
+    )
 
     countGroundTruthOnes: int = numpy.count_nonzero(groundTruth)
 
@@ -39,10 +53,12 @@ def findMask(imagePath: str, boundingBoxs: Series, depth: ndarray, depthLevel:fl
         checkMask = numpy.logical_and(maskArray, groundTruth)
         countCheckMaskOnes = numpy.count_nonzero(checkMask)
 
-        percentMasked: float = (countGroundTruthOnes - countCheckMaskOnes) / countGroundTruthOnes
+        percentMasked: float = (
+            countGroundTruthOnes - countCheckMaskOnes
+        ) / countGroundTruthOnes
 
         if percentMasked >= threshold:
             break
 
         depthLevel -= depthLevelDecline
-    return depthLevel, maskArray
+    return (depthLevel, maskArray)
