@@ -73,16 +73,16 @@ def maskArgs() -> Namespace:
         type=str,
         required=True,
     )
-    parser.add_argument(
-        "-g",
-        "--ground-truth-folder",
-        help="ground truth folder name",
-        type=str,
-        required=True,
-    )
+    # parser.add_argument(
+    #     "-g",
+    #     "--ground-truth-folder",
+    #     help="ground truth folder name",
+    #     type=str,
+    #     required=True,
+    # )
     versionArgument(parser=parser)
     parser.add_argument(
-        "-c",
+        "-a",
         "--coco-annotations-file",
         help="A COCO annotations file in JSON format",
         type=str,
