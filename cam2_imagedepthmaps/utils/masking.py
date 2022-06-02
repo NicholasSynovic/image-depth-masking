@@ -1,34 +1,48 @@
 import numpy
 from numpy import ndarray
 from PIL import Image
+from pandas import Series
 
+def sliceGroundTruthByBoundingBoxs(groundTruth: ndarray, boundingBoxs: Series)  ->  ndarray:
+    boundingBox: list
+    for boundingBox in boundingBoxs:
+        rowIndex0: float = boundingBox[1]
+        rowIndexN: int = int(rowIndex0 + boundingBox[3] + 1)
+        rowIndex0: int = int(rowIndex0)
 
-# def findMask(depth: ndarray, imagePath: str, bboxes: list, threshold: float=0.9):
-def findMask(imagePath: str):
+        columnIndex0: float = boundingBox[0]
+        columnIndexN: int = int(columnIndex0 + boundingBox[2] + 1)
+        columnIndex0: int = int(columnIndex0)
+
+        # Assign 1 to values in rowIndex0:rowIndexN and in columnIndex0:columnIndexN
+        groundTruth[rowIndex0:rowIndexN, columnIndex0:columnIndexN] = 1
+    return groundTruth
+
+def createMask(depth: ndarray, depthLevel: float)   ->  ndarray:
+    maximum: float = numpy.amax(depth)
+    thresholdValue: float = depthLevel * maximum
+    return numpy.where(depth >= thresholdValue, False, True)
+
+def findMask(imagePath: str, boundingBoxs: Series, depth: ndarray, depthLevel:float=0.9, threshold: float=0.9, depthLevelDecline: float = 0.1):
     image: ndarray = numpy.array(Image.open(imagePath))
 
     imageShape: tuple = image.shape[0:2]
     groundTruth: ndarray = numpy.zeros(imageShape)
 
-    fill_gt_bbox(gt_arr, bboxes)  # populate bounding box with 1s
-    total_ones_gt = np.count_nonzero(gt_arr)  # count 1s in groundtruth array
+    groundTruth = sliceGroundTruthByBoundingBoxs(groundTruth=groundTruth, boundingBoxs=boundingBoxs)
 
-    found_mask = False
-    depth_level = 9  # depth_level for trying depths
-    mask_arr = []
-    while not found_mask:
-        mask_arr = create_img_mask(depth_array, depth_level * 0.1)
-        output = np.logical_and(mask_arr, gt_arr)
-        output_ones = np.count_nonzero(output)
+    countGroundTruthOnes: int = numpy.count_nonzero(groundTruth)
 
-        percentage_covered = (total_ones_gt - output_ones) / total_ones_gt
+    maskArray: ndarray = []
+    while True:
+        maskArray: ndarray = createMask(depth=depth, depthLevel=depthLevel)
+        checkMask = numpy.logical_and(maskArray, groundTruth)
+        countCheckMaskOnes = numpy.count_nonzero(checkMask)
 
-        if percentage_covered >= thresh:
-            found_mask = True
+        percentMasked: float = (countGroundTruthOnes - countCheckMaskOnes) / countGroundTruthOnes
+
+        if percentMasked >= threshold:
             break
 
-        depth_level -= 1
-    return depth_level, mask_arr
-
-
-findMask(imagePath="COCO/2014/train2014/COCO_train2014_000000144812.jpg")
+        depthLevel -= depthLevelDecline
+    return depthLevel, maskArray
