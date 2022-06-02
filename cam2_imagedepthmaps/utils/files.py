@@ -12,21 +12,23 @@ from pandas import DataFrame
 import pandas
 
 
-def getImagesInFolder(folderPath: str) -> tuple | bool:
+def getImagesInFolder(folderPath: str) -> dict | bool:
     """
-    getImagesInFolder returns a tuple containing all image paths and filenames.
+    getImagesInFolder returns a dict containing all image paths and filenames.
 
-    getImagesInFolder returns a tuple of lists containing all valid image paths and filenames with and without the file extension. A valid image path is only if the file ends in: `.jpg`, `.jpeg`, `.png`.
+    getImagesInFolder returns a dict of  all valid image paths and filenames. A valid image path is only if the file ends in: `.jpg`, `.jpeg`, `.png`.
 
     A False `bool` is returned if the folder is invalid.
 
     :param folderPath: A folder path
     :type folderPath: str
-    :return: A tuple of the valid image paths and filenames with and without the file extensions or a False `bool`
-    :rtype: tuple | bool
+    :return: A dict of the valid image paths and filenames or a False `bool`
+    :rtype: dict | bool
     """
     if not os.path.isdir(folderPath):
         return False
+
+    data: dict = {}
 
     imagePaths: list = []
     filenames: list = []
@@ -37,11 +39,12 @@ def getImagesInFolder(folderPath: str) -> tuple | bool:
     obj: PosixPath
     for obj in path.iterdir():
         if obj.is_file() and obj.suffix in extensions:
-            imagePaths.append(obj.absolute().__str__())
-            filenames.append(obj.name)
-            strippedFilenames.append(obj.with_suffix('').__str__())
+            data[int(obj.with_suffix('').name.split("_")[-1])] = {
+                "path": obj.absolute().__str__(),
+                "filename": obj.name,
+            }
 
-    return (imagePaths, filenames, strippedFilenames)
+    return data
 
 
 def loadJSONData(jsonFilePath: str)   ->  DataFrame | bool:
