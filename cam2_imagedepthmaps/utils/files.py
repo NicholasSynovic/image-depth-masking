@@ -2,8 +2,14 @@
 Code to handle the file system and file manipulations.
 """
 
+from io import TextIOWrapper
 import os.path
 from pathlib import Path, PosixPath
+
+import json
+
+from pandas import DataFrame
+import pandas
 
 
 def getImagesInFolder(folderPath: str) -> tuple | bool:
@@ -37,4 +43,10 @@ def getImagesInFolder(folderPath: str) -> tuple | bool:
 
     return (imagePaths, filenames, strippedFilenames)
 
-print(getImagesInFolder("."))
+
+def getGroundTruthData(jsonFilePath: str)   ->  dict:
+    groundTruthFile: TextIOWrapper
+    with open(jsonFilePath, "r") as groundTruthFile:
+        jsonData: dict = json.load(groundTruthFile)
+        groundTruthFile.close()
+    return jsonData
