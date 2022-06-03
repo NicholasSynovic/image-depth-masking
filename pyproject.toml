@@ -39,7 +39,7 @@ lxml = "^4.8.0"
 idm = "image_depth_masking.main:main"
 
 [tool.poetry.urls]
-"Bug Tracker" = "https://github.com/NicholasSynovic/cam2_ImageDepthMaps/issues"
+"Bug Tracker" = "https://github.com/NicholasSynovic/image-depth-masking/issues"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
