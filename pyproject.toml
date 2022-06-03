@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "imageDepthMasking"
-version = "0.0.1"
+version = "0.0.2"
 description = ""
 license = ""
 authors = ["Nicholas M. Synovic <nicholas.synovic@gmail.com>"]
