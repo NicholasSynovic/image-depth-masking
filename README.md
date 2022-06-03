@@ -1,27 +1,76 @@
-## Install requirements
+# Image Depth Masking
 
-- pip install -r requirements.txt
+> An experiment to generate masks for images based off of estimated MiDaS depth
 
-## How to run
+## Table of Contents
 
-- for help on cli arguments: run `python main.py --help`
+- [Image Depth Masking](#image-depth-masking)
+  - [Table of Contents](#table-of-contents)
+  - [About](#about)
+    - [Note: Repository Undergoing Maintence](#note-repository-undergoing-maintence)
+    - [Supported Datasets](#supported-datasets)
+  - [How to Install](#how-to-install)
+    - [Packaged Code](#packaged-code)
+    - [From Source](#from-source)
+  - [How to Run](#how-to-run)
+    - [COCO specific entrypoints](#coco-specific-entrypoints)
+  - [How to Develop/ Extend](#how-to-develop-extend)
 
-### To generate an image depth map
+## About
 
-- put a folder of images into the root directory
-- then run `python main.py -i <image_folder>`
-- optional argument for model: you can specify the model(0,1,2) to use to run e.g: `python main.py -i <image_folder> -m 0`, use `--help` for more info
-- this outputs the depth maps as csv files of numpy array to a folder `<${image_folder}/depth_maps>`
+This is a [cam2]() project.
 
-### To create image mask
+It is a usage of the [MiDaS]() depth estimation models to generate masks for
+images in order to reduce the computational intensity of computer vision (CV)
+tasks.
 
-- with the new depth maps folder generated, you can create an image mask
-- run `python main.py -df <depth_map_folder>`
-- optional, threshold value: this is a value range 0 - 1, to specify threshold for the mask. e.g: `python main.py -df <depth_map_folder> -t 0.5`, use `--help` for more info
-- this outputs the image masks as csv files of numpy array to a folder `<${image_folder}/${threshold}_masks>`
+### Note: Repository Undergoing Maintence
 
-### To apply the image mask
+This repository was inherited from [Emmanual Amobi ()]().
 
-- with the new image mask folder generated, you can apply the mask to the image
-- run `python main.py -i <image_folder> -mf <mask_folder>`
-- this outputs a folder of images with the mask applied to a folder `<${image_folder}/applied_mask>`
+I'm currently undergoing a refactoring effort to package and document his work.
+Please parden the mess.
+
+### Supported Datasets
+
+Currently, the following datasets are supported:
+
+- [COCO 2014]()
+- [COCO 2017]()
+
+The following datasets are planned to be incorporated:
+
+- [MOT]()
+- [CIFAR 10]()
+- [CIFAR 100]()
+- [Google Open Images Dataset]()
+
+## How to Install
+
+### Packaged Code
+
+I release Python 3.10.4+ packages of this project here on GitHub.
+
+Get the latest version [here]() and install using `pip`.
+
+### From Source
+
+This project uses [`poetry`]() as its build tool. You **will need it** to
+package this project.
+
+1. `git clone https://github.com/NicholasSynovic/image-depth-masking.git`
+2. `cd image-depth-masking`
+3. `poetry update`
+4. `poetry build`
+5. `poetry install dist/*.whl` or `poetry install dist/*.tar.gz`
+
+## How to Run
+
+Depending on the dataset that you are using, there are different entrypoints to
+this tool.
+
+### COCO specific entrypoints
+
+`idm`
+
+## How to Develop/ Extend

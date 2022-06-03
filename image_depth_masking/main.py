@@ -6,10 +6,10 @@ from pandas import DataFrame, Series
 from PIL import Image
 from progress.bar import Bar
 
-from cam2_imagedepthmaps.utils.args import maskArgs
-from cam2_imagedepthmaps.utils.files import getImagesInFolder, loadJSONData
-from cam2_imagedepthmaps.utils.masking import findMask
-from cam2_imagedepthmaps.utils.models import loadMiDaS, runMiDaS
+from image_depth_maps.utils.args import maskArgs
+from image_depth_maps.utils.files import getImagesInFolder, loadJSONData
+from image_depth_maps.utils.masking import findMask
+from image_depth_maps.utils.models import loadMiDaS, runMiDaS
 
 
 def main():
