@@ -32,4 +32,4 @@ jobs:
           files: |
             dist/*.whl
             dist/*.tar.gz
-          token: {{ secrets.TOKEN }}
+          token: ${{ secrets.TOKEN }}
