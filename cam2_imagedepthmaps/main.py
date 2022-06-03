@@ -14,7 +14,7 @@ from cam2_imagedepthmaps.utils.models import loadMiDaS, runMiDaS
 
 def main():
     """
-    main is a wrapper program to estimate depth with MiDaS and mask images based off of the depth level.
+    main is a wrapper program to estimate depth with MiDaS and mask COCO images based off of their estimate depth level.
     """
     args: Namespace = maskArgs()
 
