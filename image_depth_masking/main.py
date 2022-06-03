@@ -6,10 +6,10 @@ from pandas import DataFrame, Series
 from PIL import Image
 from progress.bar import Bar
 
-from image_depth_maps.utils.args import maskArgs
-from image_depth_maps.utils.files import getImagesInFolder, loadJSONData
-from image_depth_maps.utils.masking import findMask
-from image_depth_maps.utils.models import loadMiDaS, runMiDaS
+from image_depth_masking.utils.args import maskArgs
+from image_depth_masking.utils.files import getImagesInFolder, loadJSONData
+from image_depth_masking.utils.masking import findMask
+from image_depth_masking.utils.models import loadMiDaS, runMiDaS
 
 
 def main():

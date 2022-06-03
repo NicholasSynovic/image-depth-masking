@@ -5,7 +5,7 @@ Code to handle command line arguments
 from argparse import ArgumentParser, HelpFormatter, Namespace
 from operator import attrgetter
 
-from image_depth_maps.utils.version import version
+from image_depth_masking.utils.version import version
 
 name: str = "cam2 Image Depth Maps: {}"
 authors: list = [
@@ -54,7 +54,7 @@ def versionArgument(parser: ArgumentParser) -> None:
 
 def maskArgs() -> Namespace:
     """
-    maskArgs has all of the arguments for the image_depth_maps.findMask_COCO.py program.
+    maskArgs has all of the arguments for the image_depth_masking.findMask_COCO.py program.
 
     :return: A Namespace containing the users input
     :rtype: Namespace
