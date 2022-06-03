@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "cam2_imagedepthmaps"
+name = "imageDepthMasking"
 version = "0.0.1"
 description = ""
 license = ""
