@@ -11,7 +11,7 @@ from pandas import DataFrame
 from progress.spinner import Spinner
 
 
-def getImagesInFolder(folderPath: str) -> dict | bool:
+def getImagesInFolder(folderPath: str, stepper: int=1) -> dict | bool:
     """
     getImagesInFolder returns a dict containing all image paths and filenames.
 
@@ -27,6 +27,7 @@ def getImagesInFolder(folderPath: str) -> dict | bool:
     if not os.path.isdir(folderPath):
         return False
 
+    step: int = 0
     data: dict = {}
 
     extensions: tuple = (".jpg", ".jpeg", ".png")
@@ -35,11 +36,13 @@ def getImagesInFolder(folderPath: str) -> dict | bool:
     with Spinner(f"Finding all valid images in {folderPath}...") as spinner:
         obj: PosixPath
         for obj in path.iterdir():
-            if obj.is_file() and obj.suffix in extensions:
-                data[int(obj.with_suffix("").name.split("_")[-1])] = {
-                    "path": obj.absolute().__str__(),
-                    "filename": obj.name,
-                }
+            if step % stepper == 0:
+                if obj.is_file() and obj.suffix in extensions:
+                    data[int(obj.with_suffix("").name.split("_")[-1])] = {
+                        "path": obj.absolute().__str__(),
+                        "filename": obj.name,
+                    }
+            step += 1
             spinner.next()
 
     return data

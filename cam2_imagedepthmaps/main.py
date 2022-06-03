@@ -1,6 +1,5 @@
 from argparse import Namespace
 
-import matplotlib.pyplot as plt
 import numpy
 from numpy import ndarray
 from pandas import DataFrame, Series
@@ -14,9 +13,14 @@ from cam2_imagedepthmaps.utils.models import loadMiDaS, runMiDaS
 
 
 def main():
+    """
+    main is a wrapper program to estimate depth with MiDaS and mask images based off of the depth level.
+    """
     args: Namespace = maskArgs()
 
-    imageFolder: dict = getImagesInFolder(folderPath=args.coco_image_folder)
+    imageFolder: dict = getImagesInFolder(
+        folderPath=args.coco_image_folder, stepper=args.stepper
+    )
     annotations: DataFrame = loadJSONData(
         jsonFilePath=args.coco_annotations_file
     )
@@ -29,6 +33,8 @@ def main():
         id: int
         for id in imageIDs:
             imagePath: str = imageFolder[id]["path"]
+            imageFilename: str = imageFolder[id]["filename"]
+
             boundingBoxs: Series = annotations[annotations["image_id"] == id][
                 "bbox"
             ]
@@ -42,9 +48,9 @@ def main():
                 imagePath=imagePath,
                 boundingBoxs=boundingBoxs,
                 depth=depth,
-                depthLevel=0.9,
-                threshold=0.9,
-                depthLevelDecline=0.1,
+                depthLevel=args.depth_level,
+                threshold=args.threshold,
+                depthLevelDecline=args.depth_level_decline,
             )
 
             depthLevel: float = maskData[0]
@@ -54,10 +60,14 @@ def main():
             img_arr = numpy.array(img_)
 
             # set pixel of mask:0 to black, leave the rest as original color
-            img_arr[mask.astype(bool), :] = 1
+            try:
+                img_arr[mask.astype(bool), :] = 0
+            except IndexError:
+                print(f"\n{imagePath}")
 
-            plt.savefig("output.png")
-            input()
+            Image.fromarray(img_arr).save(
+                f"{args.output_directory}/masked_{imageFilename}"
+            )
 
             bar.next()
 

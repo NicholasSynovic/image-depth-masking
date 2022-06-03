@@ -128,5 +128,13 @@ def maskArgs() -> Namespace:
         required=False,
         default=0.1,
     )
+    parser.add_argument(
+        "-s",
+        "--stepper",
+        help="A stepper to step through the image folder. Helps reduce the number of images to be analyzed. DEFAULT: 1",
+        type=int,
+        required=False,
+        default=1,
+    )
 
     return parser.parse_args()

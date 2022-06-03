@@ -55,6 +55,20 @@ def loadMiDaS(modelType: str, forceCPU: bool = True) -> tuple:
 def runMiDaS(
     imagePath: str, midas: Any, device: Any, transform: Any
 ) -> ndarray:
+    """
+    runMiDaS runs the MiDaS model on an image to estimate depth.
+
+    :param imagePath: Path to an image to estimate depth on
+    :type imagePath: str
+    :param midas: MiDaS model loaded into PyTorch
+    :type midas: Any
+    :param device: PyTorch device loaded with MiDaS
+    :type device: Any
+    :param transform: MiDaS image transformation model
+    :type transform: Any
+    :return: Depth values in a `ndarray`
+    :rtype: ndarray
+    """
     image: ndarray = cv2.imread(filename=imagePath)
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
@@ -70,6 +84,3 @@ def runMiDaS(
         ).squeeze()
 
     return prediction.cpu().numpy()
-
-
-# runMiDaS(imagePath="COCO/2014/train2014/COCO_train2014_000000000009.jpg")
