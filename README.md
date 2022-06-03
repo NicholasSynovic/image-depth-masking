@@ -66,11 +66,61 @@ package this project.
 
 ## How to Run
 
+To download datasets for testing, run the specific `download{}.bash` script
+where `{}` is the dataset name. You will need [`parallel`]() installed to use
+these scripts.
+
+**WARNING**: This will download the *entire* dataset of your choosing which
+could take up several gigabytes.
+
+To manually download datasets, URLs are provided in the `{}URLS.txt` files where
+`{}` is the dataset name.
+
 Depending on the dataset that you are using, there are different entrypoints to
 this tool.
 
 ### COCO specific entrypoints
 
-`idm`
+- `idm`
+  - ```
+    usage: Find masks for images from the COCO Dataset,
+
+    options:
+    -a COCO_ANNOTATIONS_FILE, --coco-annotations-file COCO_ANNOTATIONS_FILE
+                            A COCO annotations file in JSON format
+    -d DEPTH_LEVEL, --depth-level DEPTH_LEVEL
+                            The starting depth level to mask at. This should be between 0 and 1. This value is decremented by the
+                            depth level decline value until the threshold is met. DEFAULT: 0.9
+    -h, --help            show this help message and exit
+    -i COCO_IMAGE_FOLDER, --coco-image-folder COCO_IMAGE_FOLDER
+                            A path pointing to a folder of images from either the 2014 or 2017 COCO dataset.
+    -l DEPTH_LEVEL_DECLINE, --depth-level-decline DEPTH_LEVEL_DECLINE
+                            Set value that reduces the depth-level should a mask not be found at that level. This should be between
+                            0 and 1. DEFAULT: 0.1
+    -m MODEL, --model MODEL
+                            A MiDaS compatible model. Supported arguements are: 'DPT_Large', 'DPT_Hybrid', 'MiDaS_small'. DEFAULT:
+                            'MiDaS_small'.
+    -o OUTPUT_DIRECTORY, --output-directory OUTPUT_DIRECTORY
+                            A directory to store masked images. DEFAULT: ./output.
+    -s STEPPER, --stepper STEPPER
+                            A stepper to step through the image folder. Helps reduce the number of images to be analyzed. DEFAULT:
+                            1
+    -t THRESHOLD, --threshold THRESHOLD
+                            Threshold that must be met for the mask to be valid. This should be between 0 and 1. DEFAULT: 0.9
+    -v, --version         Print version of the tool
+
+    Tool created by Nicholas M. Synovic <nicholas.synovic@gmail.com,Emmanual Amobi <amobisomto@gmail.com>.
+    ```
 
 ## How to Develop/ Extend
+
+1. `git clone https://github.com/NicholasSynovic/image-depth-masking.git`
+2. `cd image-depth-masking`
+3. `poetry update`
+
+Running these steps will ensure that you have all of the dependencies
+installed and configured within a virtual environment that
+[`poetry`]() created.
+
+The [`clean.bash`](clean.bash) script is useful for cleaning your code and
+generating reports.
