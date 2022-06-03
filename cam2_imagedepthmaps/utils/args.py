@@ -96,4 +96,37 @@ def maskArgs() -> Namespace:
         required=False,
         default="MiDaS_small",
     )
+    parser.add_argument(
+        "-o",
+        "--output-directory",
+        help="A directory to store masked images. DEFAULT: ./output.",
+        type=str,
+        required=False,
+        default="output",
+    )
+    parser.add_argument(
+        "-d",
+        "--depth-level",
+        help="The starting depth level to mask at. This should be between 0 and 1. This value is decremented by the depth level decline value until the threshold is met. DEFAULT: 0.9",
+        type=float,
+        required=False,
+        default=0.9,
+    )
+    parser.add_argument(
+        "-t",
+        "--threshold",
+        help="Threshold that must be met for the mask to be valid. This should be between 0 and 1. DEFAULT: 0.9",
+        type=float,
+        required=False,
+        default=0.9,
+    )
+    parser.add_argument(
+        "-l",
+        "--depth-level-decline",
+        help="Set value that reduces the depth-level should a mask not be found at that level. This should be between 0 and 1. DEFAULT: 0.1",
+        type=float,
+        required=False,
+        default=0.1,
+    )
+
     return parser.parse_args()
