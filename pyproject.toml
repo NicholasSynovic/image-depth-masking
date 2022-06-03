@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "imageDepthMasking"
+name = "image_depth_masking"
 version = "0.0.2"
 description = ""
 license = ""
@@ -36,7 +36,7 @@ pytest = "^5.2"
 lxml = "^4.8.0"
 
 [tool.poetry.scripts]
-idm = "cam2_imagedepthmaps.main:main"
+idm = "image_depth_masking.main:main"
 
 [tool.poetry.urls]
 "Bug Tracker" = "https://github.com/NicholasSynovic/cam2_ImageDepthMaps/issues"
