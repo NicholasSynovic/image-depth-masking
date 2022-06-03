@@ -1,7 +1,7 @@
 """
 Code to handle application version
 """
-__version__: str = "0.0.4"
+__version__: str = "0.0.5"
 
 
 def version() -> str:
