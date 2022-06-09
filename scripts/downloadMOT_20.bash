@@ -1,0 +1,12 @@
+#!/bin/bash
+
+directory="../downloads/MOT_20"
+
+mkdir ../downloads
+mkdir $directory
+
+wget -q -O $directory/mot20.zip --progress=bar --show-progress -c https://motchallenge.net/data/MOT20.zip
+
+unzip $directory/*.zip -d $directory
+
+rm $directory/*.zip

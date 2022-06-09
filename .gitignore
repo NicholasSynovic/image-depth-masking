@@ -31,3 +31,5 @@ checks
 COCO
 !cocoURLS_*
 output*
+*.zip
+downloads/
