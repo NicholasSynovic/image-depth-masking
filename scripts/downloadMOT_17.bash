@@ -6,7 +6,3 @@ mkdir ../downloads
 mkdir $directory
 
 wget -q -O $directory/mot17.zip --progress=bar --show-progress -c https://motchallenge.net/data/MOT17.zip
-
-unzip $directory/*.zip -d $directory
-
-rm $directory/*.zip
