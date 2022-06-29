@@ -2,8 +2,7 @@
 
 directory="../downloads/SVHN"
 
-mkdir ../downloads
-mkdir $directory
+mkdir -p ../downloads/$directory
 
 wget -q -O $directory/svhnTrain.zip --progress=bar --show-progress -c http://ufldl.stanford.edu/housenumbers/train.tar.gz
 

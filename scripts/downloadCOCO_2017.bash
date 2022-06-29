@@ -2,8 +2,7 @@
 
 directory="../downloads/COCO_2017"
 
-mkdir ../downloads
-mkdir $directory
+mkdir -p ../downloads/$directory
 
 wget -q -O $directory/panopticAnnotations.zip --progress=bar --show-progress -c http://images.cocodataset.org/annotations/panoptic_annotations_trainval2017.zip
 
