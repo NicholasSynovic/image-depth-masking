@@ -33,3 +33,4 @@ COCO
 output*
 *.zip
 downloads/
+dist/
